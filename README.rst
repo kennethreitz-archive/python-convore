@@ -14,12 +14,26 @@ Convore: Python API Wrapper
 Overview
 --------
 
-TBD
+This is going to be awesome, and modeled after the excellent github2 module. 
 
 Usage
 -----
 
-TBD
+Hmm.. ::
+
+	>>> from convore import Convore
+	>>> convore = Convore('username', 'password')
+	
+	>>> concore.groups
+	[<group id='123'>, ...]
+	
+	convore.groups[id] ?
+	
+	convore.groups.create(name, decription=None, slug=None)
+	
+	
+
+
 Installation
 ------------
 
