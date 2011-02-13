@@ -55,9 +55,12 @@ class Convore(object):
 	"""
 
 	def __init__(self, username, password):
-		pass
+		
+		
+		self.verify()
 
 	def verify(self):
+		"""Authenticates. Returns True if authentication is successful, False if not."""
 		pass
 		
 
