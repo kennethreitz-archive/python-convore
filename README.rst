@@ -60,5 +60,5 @@ Roadmap
 - Test it!
 - Fo shizzle
 
-.. _`the repository`: http://github.com/kennethreitz/tablib
-.. _AUTHORS: http://github.com/kennethreitz/tablib/blob/master/AUTHORS
+.. _`the repository`: http://github.com/kennethreitz/python-convore
+.. _AUTHORS: http://github.com/kennethreitz/python-convore/blob/master/AUTHORS
