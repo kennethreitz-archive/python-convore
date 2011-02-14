@@ -15,7 +15,7 @@ if sys.argv[-1] == "publish":
 	publish()
 	sys.exit()
 
-required = []
+required = ['requests']
 
 # if python > 2.6, require simplejson
 
