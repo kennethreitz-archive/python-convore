@@ -9,6 +9,7 @@
     :license: ISC, see LICENSE for more details.
 """
 
+import requests
 
 
 __title__ = 'convore'
@@ -18,6 +19,9 @@ __author__ = 'Kenneth Reitz'
 __license__ = 'ISC'
 __copyright__ = 'Copyright 2011 Kenneth Reitz'
 
+
+
+API_URL = 'https://convore.com/api/'
 
 
 class Convore(object):
@@ -30,13 +34,21 @@ class Convore(object):
 	"""
 
 	def __init__(self, username, password):
-		
+		self.username = username
+		self.password = password
+
+		requests.add_autoauth(API_URL, requests.AuthObject(self.username, self.password))
+
 		self.verify()
 
 	def verify(self):
 		"""Authenticates. Returns True if authentication is successful, False if not."""
-		pass
-		
 
-class AuthorizationFailed(Exception):
-	"Your given username/password was denied access."
+		r = requests.get(API_URL + 'account/verify.json')
+
+		if r.status_code == 200:
+			return True
+		else:
+			return False
+
+	
