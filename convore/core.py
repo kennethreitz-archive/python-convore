@@ -46,9 +46,18 @@ class Convore(object):
 
 		r = requests.get(API_URL + 'account/verify.json')
 
-		if r.status_code == 200:
-			return True
-		else:
-			return False
+		return True if r.status_code == 200 else False
+	
+		
+class Groups(object):
+	def create(self):
+		pass
 
 	
+class Group(object):
+	pass
+	def __init__(self, id):
+		pass
+
+	def leave(self):
+		pass
