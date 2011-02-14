@@ -24,7 +24,7 @@ Hmm.. ::
 	>>> from convore import Convore
 	>>> convore = Convore('username', 'password')
 	
-	>>> concore.groups
+	>>> convore.groups
 	[<group id='123'>, ...]
 	
 	convore.groups[id] ?
