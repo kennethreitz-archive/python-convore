@@ -19,9 +19,24 @@ __author__ = 'Kenneth Reitz'
 __license__ = 'ISC'
 __copyright__ = 'Copyright 2011 Kenneth Reitz'
 
-
+__all__ = ['Convore']
 
 API_URL = 'https://convore.com/api/'
+
+
+class Account(object):
+	"""Account API"""
+
+	def verify(self):
+		"""Authenticates. Returns True if authentication is successful,
+        False if not."""
+
+		r = requests.get(API_URL + 'account/verify.json')
+		return True if r.status_code == 200 else False
+
+	
+class Groups(object):
+	pass
 
 
 class Convore(object):
@@ -33,31 +48,13 @@ class Convore(object):
     
 	"""
 
+	account = Account()
+	groups = Groups()
+
+
 	def __init__(self, username, password):
 		self.username = username
 		self.password = password
 
 		requests.add_autoauth(API_URL, requests.AuthObject(self.username, self.password))
 
-		self.verify()
-
-	def verify(self):
-		"""Authenticates. Returns True if authentication is successful, False if not."""
-
-		r = requests.get(API_URL + 'account/verify.json')
-
-		return True if r.status_code == 200 else False
-	
-		
-class Groups(object):
-	def create(self):
-		pass
-
-	
-class Group(object):
-	pass
-	def __init__(self, id):
-		pass
-
-	def leave(self):
-		pass
