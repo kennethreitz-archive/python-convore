@@ -15,10 +15,13 @@ class ConvoreLiveMessage(object):
         self._id       = m['_id']
         
     def __str__(self):
+        return "<ConvoreLiveMessage _id='%s'>" % self._id
+
+    def __repr__(self):
         return ",".join(map(str,(
                     self.kind,
                     self.group_ids,
-                    "(%s)" % self.user,
+                    self.user,
                     self._ts,
                     self._id,
                     )))
@@ -37,3 +40,4 @@ if __name__ == "__main__":
 
     message = ConvoreLiveMessage(m)
     print message
+    print repr(message)

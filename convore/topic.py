@@ -19,9 +19,12 @@ class ConvoreTopic(object):
         self.id            = t['id']
 
     def __str__(self):
+        return "<ConvoreTopic id='%s'>" % self.id
+
+    def __repr__(self):
         return ",".join(map(str,(
                     self.name,
-                    "(%s)" % self.creator,
+                    self.creator,
                     self.url,
                     self.slug,
                     self.date_latest_message,

@@ -97,20 +97,27 @@ if __name__ == '__main__':
 	username, password = sys.argv[1:3]
 	client = ConvoreClient(username, password)
 	#client.verify()
-	#for group in client.groups():
-	#	print group
 
-	group = client.group_by_id(group_id=3011)
-	print group
+	for group in client.groups():
+		print group
+		print repr(group)
+
+	#group_id = 3011
+	group_id = group.id
+
+	group = client.group_by_id(group_id)
 	for topic in client.topics(group):
 		print topic
+		print repr(topic)
 	
-	topic = client.topic_by_id(5068)
+	#topic_id = 5068
+	topic_id = topic.id
+
+	topic = client.topic_by_id(topic_id)
 	for message in client.messages(topic):
 		print message
+		print repr(message)
 
 	#for message in client.live():
 	#	print message
-
-		
 		

@@ -20,10 +20,13 @@ class ConvoreGroup(object):
         self.id            = g['id']
 
     def __str__(self):
+        return "<ConvoreGroup id='%s'>" % self.id
+
+    def __repr__(self):
         return ",".join(map(str,(
                     self.members_count,
                     self.name,
-                    "(%s)" % self.creator,
+                    self.creator,
                     self.url,
                     self.slug,
                     self.date_latest_message,
@@ -51,3 +54,4 @@ if __name__ == "__main__":
 
     group = ConvoreGroup(g)
     print group
+    print repr(group)

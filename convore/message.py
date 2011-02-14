@@ -14,9 +14,12 @@ class ConvoreMessage(object):
         self.id            = m['id']
         
     def __str__(self):
+        return "<ConvoreMessage id='%s'>" % self.id
+
+    def __repr__(self):
         return ",".join(map(str,(
                     self.date_created,
                     self.message,
-                    "(%s)" % self.user,
+                    self.user,
                     self.id,
                     )))
