@@ -45,10 +45,10 @@ Hmm.. ::
     >>> convore.groups['api-2'].topics.create(name)
     <topic 'group/topic-name>
 
-    >>> convore.groups.['api-2'].topics[topic_id].messages
+    >>> convore.groups['api-2'].topics[topic_id].messages
     [<message 'group/topic/'>, ...]
 
-    >>> convore.groups.['api-2'].topics[topic_id].messages.create(message)
+    >>> convore.groups['api-2'].topics[topic_id].messages.create(message)
     True
     
 
