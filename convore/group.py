@@ -32,7 +32,7 @@ class ConvoreGroups(object):
         print params
         response = self.client._make_request(command="groups/create.json",
                                              params=params)
-        return ConvoreGroup(g, self.client)
+        return ConvoreGroup(response['group'], self.client)
 
 
 class ConvoreGroup(object):

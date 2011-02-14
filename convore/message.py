@@ -26,7 +26,7 @@ class ConvoreMessages(object):
             }
         response = self.client._make_request(command="topics/%s/messages/create.json" % self.topic_id,
                                              params=params)
-        print response
+        return ConvoreMessage(response['message'])
 
 class ConvoreMessage(object):
     def __init__(self, m):
@@ -39,9 +39,9 @@ class ConvoreMessage(object):
         return "<ConvoreMessage id='%s'>" % self.id
 
     def __repr__(self):
-        return ",".join(map(str,(
+        return "<ConvoreMessage " + ",".join(map(str,(
                     self.date_created,
                     self.message,
                     self.user,
                     self.id,
-                    )))
+                    ))) + ">"
