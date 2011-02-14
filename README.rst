@@ -19,18 +19,38 @@ This is going to be awesome, and modeled after the excellent github2 module.
 Usage
 -----
 
-Hmm.. ::
+        >>> from convore.client import ConvoreClient
+	>>> convore = ConvoreClient('username', 'password')
+	
+	>>> groups = convore.groups()
+        >>> groups
+	[<ConvoreGroup ...]
+	
+	>>> topics = groups[0].topics()
+	>>> topics
+	[<ConvoreTopic ...]
+	>>> len(topics)
+	14
 
-	>>> from convore import Convore
-	>>> convore = Convore('username', 'password')
+	>>> messages = topics[0].messages()
+	>>> messages
+	[<ConvoreMessage ...]
+
+
+	>>> new_topic = groups[0].topics.create(name="New Topic")
+	>>> new_topic
+	<ConvoreTopic New Topic, ...
+
+	>>> new_topic.messages.create(message="The first message")
+	>>> new_topic.messages.create(message="The 2nd one")
+	>>> len(new_topic.messages())
+	2
+
+	>>> convore.groups['292']
+        <ConvoreGroup 674,Python,...
 	
-	>>> convore.groups
-	[<group id='123'>, ...]
-	
-	convore.groups[id] ?
-	
-	convore.groups.create(name, decription=None, slug=None)
-	
+	>>> convore.groups.create(name, decription=None, slug=None)
+	(group creation doesn't work at this moment..)
 	
 
 
