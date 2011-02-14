@@ -3,21 +3,22 @@
 Copyringt 2011 Kenichi Sato <ksato9700 AT gmail.com>
 '''
 
+import urllib
 import urllib2
 import json
 
-from group import ConvoreGroup
-from topic import ConvoreTopic
-from message import ConvoreMessage
+from group import ConvoreGroups
+from topic import ConvoreTopics
 from live import ConvoreLiveMessage
 
 URL_PREFIX = "https://convore.com/api/"
+#debug=100
 debug=0
 
 class ConvoreError(Exception):
 	pass
 
-class ConvoreAuthError(ConvoreError):
+class ConvoreAuthError(Exception):
 	pass
 
 class ConvoreClient(object):
@@ -32,12 +33,25 @@ class ConvoreClient(object):
 						  urllib2.HTTPCookieProcessor(),
 						  urllib2.HTTPSHandler(debug))
 
-	def _make_request(self, command, data=None, headers={}):
+		self.groups = ConvoreGroups(self)
+		self.topics = ConvoreTopics(self)
+
+	def _make_request(self, command, params=None):
 		url = URL_PREFIX + command
+		if params:
+			data = urllib.urlencode(params)
+		else:
+			data = None
+		headers = {}
 		try:
-			return self.openr.open(urllib2.Request(url = URL_PREFIX + command, 
-							       data=data,
-							       headers=headers))
+			f = self.openr.open(urllib2.Request(url = URL_PREFIX + command, 
+							    data=data,
+							    headers=headers))
+			response = json.load(f)
+			if 'error' in response:
+				raise ConvoreError(response['error'])
+			return response
+		
 		except urllib2.HTTPError as e:
 			if e.code == 401:
 				raise ConvoreAuthError() 
@@ -47,27 +61,6 @@ class ConvoreClient(object):
 	def verify(self):
 		self._make_request(command="account/verify.json")
 		
-	def groups(self):
-		response = self._make_request(command="groups.json")
-		groups = []
-		for g in json.load(response)['groups']:
-			groups.append(ConvoreGroup(g))
-		return groups
-		
-	def group_by_id(self, group_id):
-		response = self._make_request(command="groups/%s.json" % group_id)
-		return ConvoreGroup(json.load(response)['group'])
-
-	def topics(self, group):
-		response = self._make_request(command="groups/%s/topics.json" % group.id)
-		topics = []
-		for t in json.load(response)['topics']:
-			topics.append(ConvoreTopic(t))
-		return topics
-
-	def topic_by_id(self, topic_id):
-		response = self._make_request(command="topics/%s.json" % topic_id)
-		return ConvoreTopic(json.load(response)['topic'])
 
 	def live(self, group_id=None, cursor=None, topic_id=None):
 		data = {}
@@ -79,44 +72,50 @@ class ConvoreClient(object):
 			data['topic_id'] = topic_id
 		response = self._make_request(command="live")
 		messages = []
-		for m in json.load(response)['messages']:
+		for m in response['messages']:
 			messages.append(ConvoreLiveMessage(m))
 		return messages
 
 
-	def messages(self, topic):
-		response = self._make_request(command="topics/%s/messages.json" % topic.id)
-		messages = []
-		for m in json.load(response)['messages']:
-			print m
-			messages.append(ConvoreMessage(m))
-		return messages
-
 if __name__ == '__main__':
 	import sys
-	username, password = sys.argv[1:3]
+	try:
+		username, password = sys.argv[1:3]
+	except:
+		print "usage: python %s username password" % sys.argv[0]
+		sys.exit(1)
+
 	client = ConvoreClient(username, password)
 	#client.verify()
 
-	for group in client.groups():
-		print group
-		print repr(group)
-
-	#group_id = 3011
-	group_id = group.id
-
-	group = client.group_by_id(group_id)
-	for topic in client.topics(group):
-		print topic
-		print repr(topic)
+	groups = client.groups()
+	print groups
 	
-	#topic_id = 5068
-	topic_id = topic.id
+	#group = client.groups.create(name="MyTestGroup", description="desc", slug="the group")
+	#print repr(group)
 
-	topic = client.topic_by_id(topic_id)
-	for message in client.messages(topic):
-		print message
-		print repr(message)
+	# for group in groups:
+	# 	if "test" in group.slug:
+	# 		break
+
+	#print group
+	# print repr(group)
+
+	# topic = group.topics.create(name="Topic One")
+	# print repr(topic)
+	
+	# topics = group.topics()
+	# print topics
+
+	# topic = client.topics[topics[-1].id]
+	# print topic
+	# print repr(topic)
+	
+	# topic.messages.create(message="Wow, I'm the first")
+	# topic.messages.create(message="Hmm, I must be the second")
+
+	# messages = topic.messages()
+	# print messages
 
 	#for message in client.live():
 	#	print message
