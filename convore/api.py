@@ -21,7 +21,26 @@ def get(*path):
     
     url =  '%s%s%s' % (API_URL, '/'.join(map(str, path)), '.json')
     r = requests.get(url)
-    return r
+    try:
+        r.raise_for_status()
+        return r
+    except requests.HTTPError:
+        if r.status_code == 401:
+            raise LoginFailed
+        else:
+            raise APIError
+
+
+
+# ==========
+# Exceptions
+# ==========
+
+class LoginFailed(RuntimeError):
+    """Login falied!"""
+
+class APIError(RuntimeError):
+    """There was a problem properly accessing the Convore API."""
 
 
 
@@ -162,3 +181,5 @@ class Groups(UserList):
             group.import_from_api(_group)
             group.joined = True
             self.data.append(group)
+
+
