@@ -42,8 +42,8 @@ class Group(object):
         self.slug = dict['slug']
         self.date_latest_message = dict['date_latest_message']
         self.date_created = dict['date_created']
-        self.topics_count = dict['topics_count']
-        self.unread = dict['unread']
+        # self.topics_count = dict['topics_count']
+        # self.unread = dict['unread']
         self.id = dict['id']
 
     def __repr__(self):
