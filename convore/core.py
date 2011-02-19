@@ -13,6 +13,7 @@ import json
 import requests
 
 import models
+import api
 
 
 __title__ = 'convore'
@@ -27,8 +28,7 @@ API_URL = 'https://convore.com/api/'
 
 
 def login(username, password):
-    auth = requests.AuthObject(username, password)
-    requests.add_autoauth(API_URL, auth)
+    api.login(username, password)
 
     
 def account_verify():
