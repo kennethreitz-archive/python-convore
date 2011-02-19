@@ -1,3 +1,5 @@
+from datetime import datetime
+
 class User(object):
     """Convore User object."""
 
@@ -45,8 +47,12 @@ class Group(object):
         self.creator.import_from_api(d.get('creator', None))
         self.url = d.get('url', None)
         self.slug = d.get('slug', None)
-        self.date_latest_message = d.get('date_latest_message', None)
-        self.date_created = d.get('date_created', None)
+        self.date_latest_message = datetime.fromtimestamp(
+                d.get('date_latest_message', None)
+        )
+        self.date_created = datetime.fromtimestamp(
+                d.get('date_created', None)
+        )
         self.topics_count = d.get('topics_count', None)
         self.unread = d.get('unread', None)
         self.id = d.get('id', None)
