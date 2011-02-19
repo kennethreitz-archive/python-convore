@@ -21,10 +21,10 @@ Usage
 
 Hmm.. ::
 
-    >>> from convore import Convore
-    >>> convore = Convore('username', 'password')
-
-    >>> convore.account.verify()
+    >>> import convore
+    >>> convore.login('username', 'password')
+    
+    >>> convore.account_verify()
     True
 
     >>> convore.groups
@@ -36,13 +36,13 @@ Hmm.. ::
     >>> convore.groups['api-2'].leave()
     True
 
-    >>> convore.groups.create(name, description=None, slug=None)
+    >>> convore.group_create(name, description=None, slug=None)
     <group 'group-name'>
 
     >>> convore.groups['api-2'].topics
     [<topic 'group/topic-name'>, ...]
 
-    >>> convore.groups['api-2'].topics.create(name)
+    >>> convore.groups['api-2'].topic_create(name)
     <topic 'group/topic-name>
 
     >>> convore.groups['api-2'].topics[topic_id].messages
@@ -53,7 +53,7 @@ Hmm.. ::
     
 
 
-    convore.groups.create(name, decription=None, slug=None)
+    convore.group_create(name, decription=None, slug=None)
 
 
 
