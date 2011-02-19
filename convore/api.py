@@ -12,15 +12,7 @@ API_URL = 'https://convore.com/api/'
 # Helpers
 # =======
 
-def get(*path):
-    """
-    api.get('groups')
-    api.get('groups', 'id')
-    api.get('accounts', 'verify')
-    """
-    
-    url =  '%s%s%s' % (API_URL, '/'.join(map(str, path)), '.json')
-    r = requests.get(url)
+def _safe_response(r):
     try:
         r.raise_for_status()
         return r
@@ -30,7 +22,22 @@ def get(*path):
         else:
             raise APIError
 
+def get(*path):
+    """
+    api.get('groups')
+    api.get('groups', 'id')
+    api.get('accounts', 'verify')
+    """
+    
+    url =  '%s%s%s' % (API_URL, '/'.join(map(str, path)), '.json')
+    r = requests.get(url)
+    return _safe_response(r)
 
+
+def post(params, *path):
+    url =  '%s%s%s' % (API_URL, '/'.join(map(str, path)), '.json')
+    r = requests.post(url, params=params)
+    return _safe_response(r)
 
 # ==========
 # Exceptions
@@ -141,8 +148,7 @@ class Groups(UserList):
                return group
 
         try:
-            r = requests.get(API_URL + 'groups/%s.json' % key)
-            r.raise_for_status()
+            r = get('groups', key)
 
             group = Group()
             group.import_from_api(json.loads(r.content)['group'])
