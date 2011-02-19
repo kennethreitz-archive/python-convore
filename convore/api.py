@@ -41,6 +41,7 @@ class Groups(UserList):
         except requests.HTTPError:
             return None
 
+
     def __contains__(self, key):
         
         if isinstance(key, int):
@@ -52,6 +53,7 @@ class Groups(UserList):
 
         return False
 
+    
     def __iter__(self):
         for group in self.data:
             yield group
