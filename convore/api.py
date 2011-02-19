@@ -107,10 +107,10 @@ class Group(object):
         self.creator.import_from_api(d.get('creator', None))
         self.url = d.get('url', None)
         self.slug = d.get('slug', None)
-        self.date_latest_message = datetime.fromtimestamp(
+        self.date_latest_message = datetime.utcfromtimestamp(
                 d.get('date_latest_message', None)
         )
-        self.date_created = datetime.fromtimestamp(
+        self.date_created = datetime.utcfromtimestamp(
                 d.get('date_created', None)
         )
         self.topics_count = d.get('topics_count', None)
