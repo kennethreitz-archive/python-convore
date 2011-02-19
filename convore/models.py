@@ -31,20 +31,22 @@ class Group(object):
         self.topics_count = None
         self.unread = None
         self.id = None
+        self.joined = False
 
     def import_from_api(self, d):
-#        self.kind = dict['kind']
-        self.members_count = d['members_count']
-        self.name = d['name']
         self.creator = User()
-        self.creator.import_from_api(d['creator'])
-        self.url = d['url']
-        self.slug = d['slug']
-        self.date_latest_message = d['date_latest_message']
-        self.date_created = d['date_created']
-        # self.topics_count = dict['topics_count']
-        # self.unread = dict['unread']
-        self.id = d['id']
 
+        self.kind = d.get('kind', None)
+        self.members_count = d.get('members_count', None)
+        self.name = d.get('name', None)
+        self.creator.import_from_api(d.get('creator', None))
+        self.url = d.get('url', None)
+        self.slug = d.get('slug', None)
+        self.date_latest_message = d.get('date_latest_message', None)
+        self.date_created = d.get('date_created', None)
+        self.topics_count = d.get('topics_count', None)
+        self.unread = d.get('unread', None)
+        self.id = d.get('id', None)
+        
     def __repr__(self):
         return '<group %s>' % (self.slug)
