@@ -8,6 +8,7 @@ class User(object):
         self.img = None
 
     def import_from_api(self, d):
+        """Constructs User from Deserialized API Response."""
         self.username = d.get('username', None)
         self.url = d.get('url', None)
         self.id = d.get('id', None)
@@ -34,6 +35,8 @@ class Group(object):
         self.joined = False
 
     def import_from_api(self, d):
+        """Constructs Group from Deserialized API Response."""
+
         self.creator = User()
 
         self.kind = d.get('kind', None)
