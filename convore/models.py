@@ -7,11 +7,11 @@ class User(object):
         self.id = None
         self.img = None
 
-    def import_from_api(self, dict):
-        self.username = dict['username']
-        self.url = dict['url']
-        self.id = dict['id']
-        self.img = dict['img']
+    def import_from_api(self, d):
+        self.username = d.get('username', None)
+        self.url = d.get('url', None)
+        self.id = d.get('id', None)
+        self.img = d.get('img', None)
 
     def __repr__(self):
         return '<user @%s>' % (self.username)
