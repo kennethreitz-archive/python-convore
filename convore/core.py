@@ -11,7 +11,6 @@
 
 import api
 
-
 __title__ = 'convore'
 __version__ = '0.0.1'
 __build__ = 0x000001
@@ -20,7 +19,6 @@ __license__ = 'ISC'
 __copyright__ = 'Copyright 2011 Kenneth Reitz'
 
 
-API_URL = 'https://convore.com/api/'
 
 class Convore(object):
     def __init__(self, username, password):
@@ -33,18 +31,8 @@ class Convore(object):
         return api.Groups()
 
     def account_verify(self):
-
-        r = requests.get(API_URL + 'account/verify.json')
-        try:
-            r.raise_for_status()
-            if r.status_code == 200:
-                return True
-            else:
-                return False
-        except requests.HTTPError:
-            raise LoginFailed
-
-
-        
-class LoginFailed(RuntimeError):
-    """Login falied!"""
+        r = api.get('account', 'verify')
+        if r.status_code == 200:
+            return True
+        else:
+            return False
