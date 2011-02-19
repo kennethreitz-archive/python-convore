@@ -8,11 +8,7 @@
     :copyright: (c) 2011 by Kenneth Reitz.
     :license: ISC, see LICENSE for more details.
 """
-import json
 
-import requests
-
-import models
 import api
 
 
@@ -26,48 +22,29 @@ __copyright__ = 'Copyright 2011 Kenneth Reitz'
 
 API_URL = 'https://convore.com/api/'
 
+class Convore(object):
+    def __init__(self, username, password):
+        self.username = username
 
-def login(username, password):
-    api.login(username, password)
+        api.login(username, password)
 
-    
-def account_verify():
-    r = requests.get(API_URL + 'account/verify.json')
-    try:
-        r.raise_for_status()
-        if r.status_code == 200:
-            return True
-        else:
-            return False
-    except requests.HTTPError:
-        raise LoginFailed
+    @property
+    def groups(self):
+        return api.Groups()
 
+    def account_verify(self):
 
-def groups(group_id=None):
-    # seeking list of groups
-    try:
-
-        if not group_id:
-            r = requests.get(API_URL + 'groups.json')
-            groups = json.loads(r.content)['groups']
-
-            _groups = []
-            
-            for group in groups:
-                _group = models.Group()
-                _group.import_from_api(group)
-                _groups.append(_group)
+        r = requests.get(API_URL + 'account/verify.json')
+        try:
+            r.raise_for_status()
+            if r.status_code == 200:
+                return True
+            else:
+                return False
+        except requests.HTTPError:
+            raise LoginFailed
 
 
-            return _groups
-        # seeking unique group
-        else:
-
-            pass
-    except requests.HTTPError:
-        raise LoginFailed
-
-
-
+        
 class LoginFailed(RuntimeError):
     """Login falied!"""
