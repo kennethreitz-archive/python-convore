@@ -8,8 +8,11 @@
     :copyright: (c) 2011 by Kenneth Reitz.
     :license: ISC, see LICENSE for more details.
 """
+import json
 
 import requests
+
+import models
 
 
 __title__ = 'convore'
@@ -19,42 +22,52 @@ __author__ = 'Kenneth Reitz'
 __license__ = 'ISC'
 __copyright__ = 'Copyright 2011 Kenneth Reitz'
 
-__all__ = ['Convore']
 
 API_URL = 'https://convore.com/api/'
 
 
-class Account(object):
-	"""Account API"""
+def login(username, password):
+    auth = requests.AuthObject(username, password)
+    requests.add_autoauth(API_URL, auth)
 
-	def verify(self):
-		"""Authenticates. Returns True if authentication is successful,
-        False if not."""
-
-		r = requests.get(API_URL + 'account/verify.json')
-		return True if r.status_code == 200 else False
-
-	
-class Groups(object):
-	pass
-
-
-class Convore(object):
-	"""The :class:`Convore` object is the heart of this api wrapper. It
-	provides all core functionality.
-
-    :param username: Username to authenticate with.
-    :param password: Password for given username.
     
-	"""
+def account_verify():
+    r = requests.get(API_URL + 'account/verify.json')
+    try:
+        r.raise_for_status()
+        if r.status_code == 200:
+            return True
+        else:
+            return False
+    except requests.HTTPError:
+        raise LoginFailed
 
-	account = Account()
-	groups = Groups()
+
+def groups(group_id=None):
+    # seeking list of groups
+    try:
+
+        if not group_id:
+            r = requests.get(API_URL + 'groups.json')
+            groups = json.loads(r.content)['groups']
+
+            _groups = []
+            
+            for group in groups:
+                _group = models.Group()
+                _group.import_from_api(group)
+                _groups.append(_group)
 
 
-	def __init__(self, username, password):
-		self.username = username
-		self.password = password
+            return _groups
+        # seeking unique group
+        else:
 
-		requests.add_autoauth(API_URL, requests.AuthObject(self.username, self.password))
+            pass
+    except requests.HTTPError:
+        raise LoginFailed
 
+
+
+class LoginFailed(RuntimeError):
+    """Login falied!"""
