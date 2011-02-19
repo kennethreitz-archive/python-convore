@@ -16,8 +16,8 @@ class ConvoreTestSuite(unittest.TestCase):
         pass
 
     def test_convore_login(self):
-        convore.login('requeststest', 'requeststest')
-        self.assertEqual(convore.account_verify(), True)
+        _convore = convore.Convore('requeststest', 'requeststest')
+        self.assertEqual(_convore.account_verify(), True)
 
     
 
