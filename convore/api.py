@@ -10,12 +10,12 @@
 """
 
 import json
-from datetime import datetime
 
 import requests
 
 from types import SyncedList
-
+import models
+import groups
 
 
 
@@ -57,11 +57,6 @@ def post(params, *path):
     return _safe_response(r)
 
 
-
-
-
-
-
 # ==========
 # Exceptions
 # ==========
@@ -75,86 +70,9 @@ class APIError(RuntimeError):
 
 
 def login(username, password):
+    """Configured API Credentials"""
     auth = requests.AuthObject(username, password)
     requests.add_autoauth(API_URL, auth)
-    
-# ======
-# Models
-# ======
-
-class User(object):
-    """Convore User object."""
-
-    def __init__(self):
-        self.username = None
-        self.url = None
-        self.id = None
-        self.img = None
-
-    def import_from_api(self, d):
-        """Constructs User from Deserialized API Response."""
-        
-        self.username = d.get('username', None)
-        self.url = d.get('url', None)
-        self.id = d.get('id', None)
-        self.img = d.get('img', None)
-
-    def __repr__(self):
-        return '<user @%s>' % (self.username)
-
-    
-class Group(object):
-    """Convore Group object."""
-
-    def __init__(self):
-        
-        self.kind = None
-        self.members_count = None
-        self.name = None
-        self.creator = None
-        self.url = None
-        self.slug = None
-        self.date_latest_message = None
-        self.date_created = None
-        self.topics_count = None
-        self.friends = None
-        self.unread = None
-        self.id = None
-        self.joined = False
-
-    def import_from_api(self, d):
-        """Constructs Group from Deserialized API Response."""
-
-        self.creator = User()
-
-        self.kind = d.get('kind', None)
-        self.members_count = d.get('members_count', None)
-        self.name = d.get('name', None)
-        self.creator.import_from_api(d.get('creator', None))
-        self.url = d.get('url', None)
-        self.slug = d.get('slug', None)
-        self.date_latest_message = datetime.utcfromtimestamp(
-                d.get('date_latest_message', None)
-        )
-        self.date_created = datetime.utcfromtimestamp(
-                d.get('date_created', None)
-        )
-        self.topics_count = d.get('topics_count', None)
-        self.unread = d.get('unread', None)
-        self.id = d.get('id', None)
-
-        self.friends = []
-        
-        if 'friend_list' in d:
-            for friend in d.get('friend_list', None):
-                _user = User()
-                _user.import_from_api(friend)
-                self.friends.append(_user)
-
-
-    def __repr__(self):
-        return '<group %s>' % (self.slug)    
-
 
 
 # ==========
@@ -169,7 +87,8 @@ class Groups(SyncedList):
     def __init__(self):
         super(Groups, self).__init__()
 
-        self.discover = GroupsDiscover()
+        self.discover = groups.GroupsDiscover()
+        self.discover.parent = self
 
     def joined(self):
         """Returns list of Joined groups."""
@@ -177,21 +96,10 @@ class Groups(SyncedList):
         return [g for g in self.data if g.joined]
 
 
-    def __contains__(self, key):
-        
-        if isinstance(key, int):
-            key = unicode(key)
-
-        for group in self.data:
-            if key in [group.id, group.slug]:
-               return True
-
-        return False
-
     def get(self, key):
         r = get('groups', key)
 
-        group = Group()
+        group = models.Group()
         group.import_from_api(json.loads(r.content)['group'])
         return group
 
@@ -202,55 +110,14 @@ class Groups(SyncedList):
         r = requests.get(API_URL + 'groups.json')
         for _group in json.loads(r.content)['groups']:
 
-            group = Group()
+            group = models.Group()
             group.import_from_api(_group)
             group.joined = True
             self.data.append(group)
 
 
             
-class GroupsDiscover(object):
-    def __init__(self):
-        self.explore = GroupsDiscoverExplore()
-        self.category = GroupDiscoverCategory()
 
-    def _discover_group(self, *cats):
-        _groups = []
-        r = get('groups', 'discover', *cats)
-        for group in json.loads(r.content)['groups']:
-            _group = Group()
-            _group.import_from_api(group)
-            _groups.append(_group)
-        return _groups
-
-    def friend(self):
-        return self._discover_group('friend')
-
-    # ^groups/discover/explore/(?P<angle>popular|recent|alphabetical).json
-
-
-class GroupsDiscoverExplore(object):
-
-    def _discover_group(self, *cats):
-        _groups = []
-        r = get('groups', 'discover', *cats)
-        for group in json.loads(r.content)['groups']:
-            _group = Group()
-            _group.import_from_api(group)
-            _groups.append(_group)
-        return _groups
-
-    def popular(self):
-        return self._discover_group('explore', 'popular')
-
-    def recent(self):
-        return self._discover_group('explore', 'recent')
-
-    def alphabetical(self):
-        return self._discover_group('explore', 'alphabetical')
-
-class GroupDiscoverCategory(SyncedList):
-    pass
         
 
 
