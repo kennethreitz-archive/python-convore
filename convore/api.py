@@ -6,7 +6,6 @@ import requests
 
 API_URL = 'https://convore.com/api/'
 
-
 #^groups/discover/friend.json
 #^groups/discover/explore/(?P<angle>popular|recent|alphabetical).json
 #^groups/discover/category.json
@@ -151,29 +150,16 @@ class Group(object):
 
 
 class Groups(object):
-    
+
     def __init__(self):
         self.groups = []
         self.sync()
+        self.discover = GroupsDiscover()
 
     def joined(self):
         """Returns list of Joined groups."""
 
         return [g for g in self.groups if g.joined]
-
-
-    def discover_friend(self):
-
-        _groups = []
-
-        r = get('groups', 'discover', 'friend')
-        
-        for group in json.loads(r.content)['groups']:
-            _group = Group()
-            _group.import_from_api(group)
-            _groups.append(_group)
-            
-        return _groups
         
     def __repr__(self):
         return str(self.groups)
@@ -223,3 +209,19 @@ class Groups(object):
             group.import_from_api(_group)
             group.joined = True
             self.groups.append(group)
+
+class GroupsDiscover(object):
+    def __init__(self):
+        pass
+
+    def friend(self):
+        _groups = []
+
+        r = get('groups', 'discover', 'friend')
+
+        for group in json.loads(r.content)['groups']:
+            _group = Group()
+            _group.import_from_api(group)
+            _groups.append(_group)
+
+        return _groups
