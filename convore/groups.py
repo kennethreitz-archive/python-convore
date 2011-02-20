@@ -62,4 +62,20 @@ class GroupsDiscoverExplore(object):
 
 
 class GroupDiscoverCategory(SyncedList):
-    pass
+
+    __data_keys__ = ['name',]
+
+    def __init__(self):
+        super(GroupDiscoverCategory, self).__init__()
+
+    def get(self, key):
+        pass
+
+    def sync(self):
+        r = requests.get(API_URL + 'groups.json')
+#        for _group in json.loads(r.content)['groups']:
+#
+#            group = models.Group()
+#            group.import_from_api(_group)
+#            group.joined = True
+#            self.data.append(group)

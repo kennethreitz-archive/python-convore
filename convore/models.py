@@ -40,6 +40,7 @@ class Group(object):
         self.id = None
         self.joined = False
 
+        
     def import_from_api(self, d):
         """Constructs Group from Deserialized API Response."""
 
@@ -72,3 +73,11 @@ class Group(object):
 
     def __repr__(self):
         return '<group %s>' % (self.slug)
+
+
+class Category(self):
+    def __init__(self):
+        pass
+
+    def import_from_api(self, d):
+        """Constructs Category from deserialized API Response."""
