@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-from collections import MutableSequence
 
 import requests
 
@@ -132,61 +131,56 @@ class Group(object):
 class Groups(object):
     
     def __init__(self):
-        self.data = []
+        self.groups = []
         self.sync()
 
     def joined(self):
         """Returns list of Joined groups."""
 
-        return [g for g in self.data if g.joined]
+        return [g for g in self.groups if g.joined]
 
     def __repr__(self):
-        return str(self.data)
+        return str(self.groups)
 
-    
+
     def __getitem__(self, key):
 
-        if isinstance(key, int):
-            key = str(key)
+        for group in self.groups:
 
-        for group in self.data:
-
-            if key in (group.id, group.slug):
+            if str(key) in [group.id, group.slug]:
                return group
-            else:
-                print (key, group.id)
-
-
+            
         r = get('groups', key)
 
-        group = Group()
-        group.import_from_api(json.loads(r.content)['group'])
-        
-#        self.data.append(group)
-        self.data = []
-        return group
+        _group = Group()
+        _group.import_from_api(json.loads(r.content)['group'])
 
 
+        print len(self.groups)
+        self.groups.append(_group)
+        print '%s appended!' % (_group)
+        print len(self.groups)
+        return _group
+
+    def __iter__(self):
+        for group in self.groups:
+            yield group
 
     def __contains__(self, key):
         
         if isinstance(key, int):
             key = unicode(key)
 
-        for group in self.data:
-            if key in (group.id, group.slug):
+        for group in self.groups:
+            if key in [group.id, group.slug]:
                return True
 
         return False
 
-    
-    def __iter__(self):
-        for group in self.data:
-            yield group
 
     def sync(self):
 
-        self.data = []
+        self.groups = []
 
         r = requests.get(API_URL + 'groups.json')
         for _group in json.loads(r.content)['groups']:
@@ -194,6 +188,4 @@ class Groups(object):
             group = Group()
             group.import_from_api(_group)
             group.joined = True
-            self.data.append(group)
-
-
+            self.groups.append(group)
