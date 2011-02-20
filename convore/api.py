@@ -1,3 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+    convore.api
+    ~~~~~~~~~~~
+
+    This module implements the Convore API wrapper objects.
+
+    :copyright: (c) 2011 by Kenneth Reitz.
+    :license: ISC, see LICENSE for more details.
+"""
+
 import json
 from datetime import datetime
 
@@ -6,18 +17,13 @@ import requests
 
 API_URL = 'https://convore.com/api/'
 
-#^groups/discover/friend.json
-#^groups/discover/explore/(?P<angle>popular|recent|alphabetical).json
-#^groups/discover/category.json
-#^groups/discover/category/(?P<category>[\w-]+).json
-#^groups/discover/search.json
-
 
 # =======
 # Helpers
 # =======
 
 def _safe_response(r):
+    print r
     try:
         r.raise_for_status()
         return r
@@ -25,8 +31,8 @@ def _safe_response(r):
         if r.status_code == 401:
             raise LoginFailed
         else:
-#            raise APIError
-            return r
+            raise APIError
+
 
 def get(*path):
     """
@@ -47,6 +53,10 @@ def post(params, *path):
     url =  '%s%s%s' % (API_URL, '/'.join(map(str, path)), '.json')
     r = requests.post(url, params=params)
     return _safe_response(r)
+
+
+
+
 
 
 
@@ -95,6 +105,7 @@ class Group(object):
     """Convore Group object."""
 
     def __init__(self):
+        
         self.kind = None
         self.members_count = None
         self.name = None
@@ -149,25 +160,23 @@ class Group(object):
 # ==========
 
 
-class Groups(object):
+class Groups(SyncedList):
 
     def __init__(self):
-        self.groups = []
+        super(Groups, self).__init__()
+
         self.sync()
         self.discover = GroupsDiscover()
 
     def joined(self):
         """Returns list of Joined groups."""
 
-        return [g for g in self.groups if g.joined]
+        return [g for g in self.data if g.joined]
         
-    def __repr__(self):
-        return str(self.groups)
-
 
     def __getitem__(self, key):
 
-        for group in self.groups:
+        for group in self.data:
 
             if str(key) in [group.id, group.slug]:
                return group
@@ -176,22 +185,16 @@ class Groups(object):
 
         _group = Group()
         _group.import_from_api(json.loads(r.content)['group'])
-        self.groups.append(_group)
+        self.data.append(_group)
         
         return _group
 
-    
-    def __iter__(self):
-        for group in self.groups:
-            yield group
-
-            
     def __contains__(self, key):
         
         if isinstance(key, int):
             key = unicode(key)
 
-        for group in self.groups:
+        for group in self.data:
             if key in [group.id, group.slug]:
                return True
 
@@ -200,7 +203,7 @@ class Groups(object):
 
     def sync(self):
 
-        self.groups = []
+        self.data = []
 
         r = requests.get(API_URL + 'groups.json')
         for _group in json.loads(r.content)['groups']:
@@ -208,20 +211,64 @@ class Groups(object):
             group = Group()
             group.import_from_api(_group)
             group.joined = True
-            self.groups.append(group)
+            self.data.append(group)
 
+
+            
 class GroupsDiscover(object):
     def __init__(self):
-        pass
+        self.explore = GroupsDiscoverExplore()
+        self.category = GroupDiscoverCategory()
 
-    def friend(self):
+    def _discover_group(self, *cats):
         _groups = []
-
-        r = get('groups', 'discover', 'friend')
-
+        r = get('groups', 'discover', *cats)
         for group in json.loads(r.content)['groups']:
             _group = Group()
             _group.import_from_api(group)
             _groups.append(_group)
-
         return _groups
+
+    def friend(self):
+        return self._discover_group('friend')
+
+    # ^groups/discover/explore/(?P<angle>popular|recent|alphabetical).json
+
+
+class GroupsDiscoverExplore(object):
+
+    def _discover_group(self, *cats):
+        _groups = []
+        r = get('groups', 'discover', *cats)
+        for group in json.loads(r.content)['groups']:
+            _group = Group()
+            _group.import_from_api(group)
+            _groups.append(_group)
+        return _groups
+
+    def popular(self):
+        return self._discover_group('explore', 'popular')
+
+    def recent(self):
+        return self._discover_group('explore', 'recent')
+
+    def alphabetical(self):
+        return self._discover_group('explore', 'alphabetical')
+
+class GroupDiscoverCategory(SyncedList):
+    pass
+        
+
+
+#^groups/discover/friend.json
+#^groups/discover/explore/(?P<angle>popular|recent|alphabetical).json
+#^groups/discover/category.json
+#^groups/discover/category/(?P<category>[\w-]+).json
+#^groups/discover/search.json
+#^groups/(?P<group_id>\d+)/join.json
+#^groups/(?P<group_id>\d+)/request.json
+
+
+
+
+
