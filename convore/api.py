@@ -14,6 +14,10 @@ from datetime import datetime
 
 import requests
 
+from types import SyncedList
+
+
+
 
 API_URL = 'https://convore.com/api/'
 
@@ -23,7 +27,6 @@ API_URL = 'https://convore.com/api/'
 # =======
 
 def _safe_response(r):
-    print r
     try:
         r.raise_for_status()
         return r
@@ -43,7 +46,6 @@ def get(*path):
     url =  '%s%s%s' % (API_URL, '/'.join(map(str, path)), '.json')
 
     r = requests.get(url)
-    print r.url
    
     return _safe_response(r)
 
@@ -162,32 +164,18 @@ class Group(object):
 
 class Groups(SyncedList):
 
+    __data_keys__ = ['id', 'slug']
+
     def __init__(self):
         super(Groups, self).__init__()
 
-        self.sync()
         self.discover = GroupsDiscover()
 
     def joined(self):
         """Returns list of Joined groups."""
 
         return [g for g in self.data if g.joined]
-        
 
-    def __getitem__(self, key):
-
-        for group in self.data:
-
-            if str(key) in [group.id, group.slug]:
-               return group
-            
-        r = get('groups', key)
-
-        _group = Group()
-        _group.import_from_api(json.loads(r.content)['group'])
-        self.data.append(_group)
-        
-        return _group
 
     def __contains__(self, key):
         
@@ -200,6 +188,12 @@ class Groups(SyncedList):
 
         return False
 
+    def get(self, key):
+        r = get('groups', key)
+
+        group = Group()
+        group.import_from_api(json.loads(r.content)['group'])
+        return group
 
     def sync(self):
 
