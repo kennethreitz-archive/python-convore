@@ -28,6 +28,7 @@ class SyncedList(object):
     def __repr__(self):
         return str(self.data)
 
+    
     def __getitem__(self, key):
 
         if isinstance(key, int):
@@ -44,9 +45,11 @@ class SyncedList(object):
                 self.data.append(_fetched)
                 return _fetched
 
+            
     def __iter__(self):
         for d in self.data:
             yield d
+
 
     def __len__(self):
         return len(self.data)
