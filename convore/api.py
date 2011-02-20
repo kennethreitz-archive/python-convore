@@ -1,12 +1,13 @@
 import json
 from datetime import datetime
-from UserList import UserList
+from collections import MutableSequence
 
 import requests
 
 
-
 API_URL = 'https://convore.com/api/'
+
+
 
 # =======
 # Helpers
@@ -35,6 +36,7 @@ def get(*path):
 
 
 def post(params, *path):
+
     url =  '%s%s%s' % (API_URL, '/'.join(map(str, path)), '.json')
     r = requests.post(url, params=params)
     return _safe_response(r)
@@ -127,7 +129,7 @@ class Group(object):
 # ==========
 
 
-class Groups(UserList):
+class Groups(object):
     
     def __init__(self):
         self.data = []
@@ -138,26 +140,32 @@ class Groups(UserList):
 
         return [g for g in self.data if g.joined]
 
+    def __repr__(self):
+        return str(self.data)
+
+    
     def __getitem__(self, key):
 
         if isinstance(key, int):
-            key = unicode(key)
+            key = str(key)
 
         for group in self.data:
+
             if key in (group.id, group.slug):
                return group
+            else:
+                print (key, group.id)
 
-        try:
-            r = get('groups', key)
 
-            group = Group()
-            group.import_from_api(json.loads(r.content)['group'])
+        r = get('groups', key)
 
-            self.data.append(group)
-            return group
+        group = Group()
+        group.import_from_api(json.loads(r.content)['group'])
         
-        except requests.HTTPError:
-            return None
+#        self.data.append(group)
+        self.data = []
+        return group
+
 
 
     def __contains__(self, key):
