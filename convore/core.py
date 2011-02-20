@@ -18,9 +18,10 @@ __author__ = 'Kenneth Reitz'
 __license__ = 'ISC'
 __copyright__ = 'Copyright 2011 Kenneth Reitz'
 
-
+__all__ = ('Convore',)
 
 class Convore(object):
+    """The main Convore interface object."""
     def __init__(self, username, password):
         self.username = username
         api.login(username, password)
