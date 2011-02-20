@@ -23,12 +23,9 @@ __copyright__ = 'Copyright 2011 Kenneth Reitz'
 class Convore(object):
     def __init__(self, username, password):
         self.username = username
-
         api.login(username, password)
 
-    @property
-    def groups(self):
-        return api.Groups()
+        self.groups = api.Groups()
 
     def account_verify(self):
         r = api.get('account', 'verify')
