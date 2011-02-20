@@ -105,7 +105,7 @@ class Group(object):
         self.date_latest_message = None
         self.date_created = None
         self.topics_count = None
-        self.friend_list = None
+        self.friends = None
         self.unread = None
         self.id = None
         self.joined = False
@@ -131,13 +131,13 @@ class Group(object):
         self.unread = d.get('unread', None)
         self.id = d.get('id', None)
 
-        self.friend_list = []
+        self.friends = []
         
         if 'friend_list' in d:
             for friend in d.get('friend_list', None):
                 _user = User()
                 _user.import_from_api(friend)
-                self.friend_list.append(_user)
+                self.friends.append(_user)
 
 
     def __repr__(self):
