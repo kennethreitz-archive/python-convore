@@ -7,6 +7,12 @@ import requests
 API_URL = 'https://convore.com/api/'
 
 
+#^groups/discover/friend.json
+#^groups/discover/explore/(?P<angle>popular|recent|alphabetical).json
+#^groups/discover/category.json
+#^groups/discover/category/(?P<category>[\w-]+).json
+#^groups/discover/search.json
+
 
 # =======
 # Helpers
@@ -20,26 +26,30 @@ def _safe_response(r):
         if r.status_code == 401:
             raise LoginFailed
         else:
-            raise APIError
+#            raise APIError
+            return r
 
-def get(*path, **kwargs):
+def get(*path):
     """
     api.get('groups')
     api.get('groups', 'id')
     api.get('accounts', 'verify')
     """
-    params = kwargs.get('params', None)
     url =  '%s%s%s' % (API_URL, '/'.join(map(str, path)), '.json')
-    r = requests.get(url, params=params)
+
+    r = requests.get(url)
+    print r.url
+   
     return _safe_response(r)
 
 
-def post(*path, **kwargs):
-    params = kwargs.get('params', None)
+def post(params, *path):
     
     url =  '%s%s%s' % (API_URL, '/'.join(map(str, path)), '.json')
     r = requests.post(url, params=params)
     return _safe_response(r)
+
+
 
 # ==========
 # Exceptions
@@ -72,6 +82,7 @@ class User(object):
 
     def import_from_api(self, d):
         """Constructs User from Deserialized API Response."""
+        
         self.username = d.get('username', None)
         self.url = d.get('url', None)
         self.id = d.get('id', None)
@@ -94,6 +105,7 @@ class Group(object):
         self.date_latest_message = None
         self.date_created = None
         self.topics_count = None
+        self.friend_list = None
         self.unread = None
         self.id = None
         self.joined = False
@@ -119,6 +131,15 @@ class Group(object):
         self.unread = d.get('unread', None)
         self.id = d.get('id', None)
 
+        self.friend_list = []
+        
+        if 'friend_list' in d:
+            for friend in d.get('friend_list', None):
+                _user = User()
+                _user.import_from_api(friend)
+                self.friend_list.append(_user)
+
+
     def __repr__(self):
         return '<group %s>' % (self.slug)    
 
@@ -141,7 +162,19 @@ class Groups(object):
         return [g for g in self.groups if g.joined]
 
 
+    def discover_friend(self):
 
+        _groups = []
+
+        r = get('groups', 'discover', 'friend')
+        
+        for group in json.loads(r.content)['groups']:
+            _group = Group()
+            _group.import_from_api(group)
+            _groups.append(_group)
+            
+        return _groups
+        
     def __repr__(self):
         return str(self.groups)
 
@@ -161,10 +194,12 @@ class Groups(object):
         
         return _group
 
+    
     def __iter__(self):
         for group in self.groups:
             yield group
 
+            
     def __contains__(self, key):
         
         if isinstance(key, int):
