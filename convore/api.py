@@ -22,20 +22,21 @@ def _safe_response(r):
         else:
             raise APIError
 
-def get(*path):
+def get(*path, **kwargs):
     """
     api.get('groups')
     api.get('groups', 'id')
     api.get('accounts', 'verify')
     """
-    
+    params = kwargs.get('params', None)
     url =  '%s%s%s' % (API_URL, '/'.join(map(str, path)), '.json')
-    r = requests.get(url)
+    r = requests.get(url, params=params)
     return _safe_response(r)
 
 
-def post(params, *path):
-
+def post(*path, **kwargs):
+    params = kwargs.get('params', None)
+    
     url =  '%s%s%s' % (API_URL, '/'.join(map(str, path)), '.json')
     r = requests.post(url, params=params)
     return _safe_response(r)
@@ -139,6 +140,8 @@ class Groups(object):
 
         return [g for g in self.groups if g.joined]
 
+
+
     def __repr__(self):
         return str(self.groups)
 
@@ -154,12 +157,8 @@ class Groups(object):
 
         _group = Group()
         _group.import_from_api(json.loads(r.content)['group'])
-
-
-        print len(self.groups)
         self.groups.append(_group)
-        print '%s appended!' % (_group)
-        print len(self.groups)
+        
         return _group
 
     def __iter__(self):
