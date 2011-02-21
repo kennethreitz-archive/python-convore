@@ -72,7 +72,7 @@ class GroupDiscoverCategory(SyncedList):
         pass
 
     def sync(self):
-        r = requests.get(API_URL + 'groups.json')
+        r = api.get('groups')
 #        for _group in json.loads(r.content)['groups']:
 #
 #            group = models.Group()
