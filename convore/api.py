@@ -9,7 +9,7 @@
     :license: ISC, see LICENSE for more details.
 """
 
-import json
+from convore.packages.anyjson import deserialize
 
 import requests
 
@@ -100,7 +100,7 @@ class Groups(SyncedList):
         r = get('groups', key)
 
         group = models.Group()
-        group.import_from_api(json.loads(r.content)['group'])
+        group.import_from_api(deserialize(r.content)['group'])
         return group
 
     def sync(self):
@@ -108,7 +108,7 @@ class Groups(SyncedList):
         self.data = []
 
         r = get('groups')
-        for _group in json.loads(r.content)['groups']:
+        for _group in deserialize(r.content)['groups']:
 
             group = models.Group()
             group.import_from_api(_group)
