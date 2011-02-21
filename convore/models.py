@@ -1,4 +1,18 @@
+# -*- coding: utf-8 -*-
+"""
+    convore.models
+    ~~~~~~~~~~~~~~
+
+    This module implements the internal models for 
+    Convore API object storage.
+
+    :copyright: (c) 2011 by Kenneth Reitz.
+    :license: ISC, see LICENSE for more details.
+"""
+
 from datetime import datetime
+
+
 
 class User(object):
     """Convore User object."""

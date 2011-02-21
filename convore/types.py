@@ -3,14 +3,17 @@
     convore.types
     ~~~~~~~~~~~
 
-    This module contains he wrapper objects.
+    This module contains the reusable helper objects 
+    used throughout the wrapper.
 
     :copyright: (c) 2011 by Kenneth Reitz.
     :license: ISC, see LICENSE for more details.
 """
 
+
+
 class SyncedList(object):
-    """ Synced List datatype.
+    """Synced List datatype.
 
     __data_keys__ are the list of 'primary keys' for item lookup.
     self.get() needs to be defined.

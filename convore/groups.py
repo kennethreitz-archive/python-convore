@@ -1,8 +1,20 @@
-import json
+# -*- coding: utf-8 -*-
+"""
+    convore.groups
+    ~~~~~~~~~~~
 
+    This module implements the group endpoint sub-wrappers.
+
+    :copyright: (c) 2011 by Kenneth Reitz.
+    :license: ISC, see LICENSE for more details.
+"""
 import api
 import models
-from types import SyncedList
+from convore.packages.anyjson import deserialize
+from convore.types import SyncedList
+
+
+
 
 
 class GroupsDiscover(object):
@@ -15,7 +27,7 @@ class GroupsDiscover(object):
     def _discover_group(self, *cats):
         _groups = []
         r = api.get('groups', 'discover', *cats)
-        for group in json.loads(r.content)['groups']:
+        for group in deserialize(r.content)['groups']:
             _group = models.Group()
             _group.import_from_api(group)
             _groups.append(_group)
@@ -37,7 +49,7 @@ class GroupsDiscoverExplore(object):
     def _discover_group(self, *cats):
         _groups = []
         r = api.get('groups', 'discover', *cats)
-        for group in json.loads(r.content)['groups']:
+        for group in deserialize(r.content)['groups']:
             _group = models.Group()
             _group.import_from_api(group)
             _groups.append(_group)
