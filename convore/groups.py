@@ -80,11 +80,9 @@ class GroupDiscoverCategory(SyncedList):
 
     def get(self, key):
 
-        r = api.get('groups', 'discover', 'category', key,
-                    error='Invalid group slug given.'
-                    )
-
-
+        error = 'Invalid group slug given.'
+        
+        r = api.get('groups', 'discover', 'category', key, error=error)
 
         groups = deserialize(r.content)['groups']
 
