@@ -62,7 +62,7 @@ class ConvoreGroups(unittest.TestCase):
 
 
     def test_discover_category(self):
-        convore.groups.discover.category
+        self.convore.groups.discover.category
 
 
 if __name__ == '__main__':
