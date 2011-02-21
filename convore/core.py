@@ -9,7 +9,9 @@
     :license: ISC, see LICENSE for more details.
 """
 
+
 import api
+
 
 __title__ = 'convore'
 __version__ = '0.0.1'
@@ -20,6 +22,7 @@ __copyright__ = 'Copyright 2011 Kenneth Reitz'
 __docformat__ = 'restructuredtext'
 
 __all__ = ('Convore',)
+
 
 
 class Convore(object):
