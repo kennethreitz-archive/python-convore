@@ -75,7 +75,7 @@ class Group(object):
         return '<group %s>' % (self.slug)
 
 
-class Category(self):
+class Category(object):
     def __init__(self):
         pass
 
