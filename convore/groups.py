@@ -41,8 +41,6 @@ class GroupsDiscover(object):
     def friend(self):
         return self._discover_group('friend')
 
-    # ^groups/discover/explore/(?P<angle>popular|recent|alphabetical).json
-
 
 class GroupsDiscoverExplore(object):
 
@@ -75,19 +73,21 @@ class GroupsDiscoverExplore(object):
 
 class GroupDiscoverCategory(SyncedList):
 
-    __data_keys__ = ['name',]
+    __data_keys__ = ['slug',]
 
     def __init__(self):
         super(GroupDiscoverCategory, self).__init__()
 
     def get(self, key):
-        pass
+        r = api.get('groups', 'discover', 'category', key)
+        print r.content
+        cat = models.Category()
+        cat.import_from_api(deserialize(r.content)['categories'])
+        return cat
 
     def sync(self):
-        r = api.get('groups')
-#        for _group in json.loads(r.content)['groups']:
-#
-#            group = models.Group()
-#            group.import_from_api(_group)
-#            group.joined = True
-#            self.data.append(group)
+        r = api.get('groups', 'discover', 'category')
+        for _cat in deserialize(r.content)['categories']:
+            cat = models.Category()
+            cat.import_from_api(_cat)
+            self.data.append(cat)

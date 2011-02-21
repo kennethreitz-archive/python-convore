@@ -91,7 +91,15 @@ class Group(object):
 
 class Category(object):
     def __init__(self):
-        pass
+        self.groups_count = None
+        self.slug = None
+        self.name = None
+
+    def __repr__(self):
+        return '<category %s>' % (self.slug)
 
     def import_from_api(self, d):
         """Constructs Category from deserialized API Response."""
+        self.groups_count = d.get('groups_count', None)
+        self.slug = d.get('slug', None)
+        self.name = d.get('name', None)

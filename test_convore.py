@@ -64,6 +64,10 @@ class ConvoreGroups(unittest.TestCase):
     def test_discover_category(self):
         self.convore.groups.discover.category
 
+        c = self.convore.groups.discover.category['gossip']
+        self.assertIsInstance(c, convore.models.Category)
+
+
 
 if __name__ == '__main__':
     unittest.main()
