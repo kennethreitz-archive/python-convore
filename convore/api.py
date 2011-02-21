@@ -107,7 +107,7 @@ class Groups(SyncedList):
 
         self.data = []
 
-        r = requests.get(API_URL + 'groups.json')
+        r = get('groups')
         for _group in json.loads(r.content)['groups']:
 
             group = models.Group()
