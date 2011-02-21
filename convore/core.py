@@ -17,6 +17,7 @@ __build__ = 0x000001
 __author__ = 'Kenneth Reitz'
 __license__ = 'ISC'
 __copyright__ = 'Copyright 2011 Kenneth Reitz'
+__docformat__ = 'restructuredtext'
 
 __all__ = ('Convore',)
 
