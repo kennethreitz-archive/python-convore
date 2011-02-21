@@ -17,7 +17,8 @@ if sys.argv[-1] == "publish":
 
 required = ['requests']
 
-# if python > 2.6, require simplejson
+if sys.version_info > (2,6):
+    required.append('simplejson')
 
 setup(
 	name='convore',
@@ -37,7 +38,7 @@ setup(
 		'Natural Language :: English',
 		'License :: OSI Approved :: ISC License (ISCL)',
 		'Programming Language :: Python',
-        # 'Programming Language :: Python :: 2.5',
+        'Programming Language :: Python :: 2.5',
         'Programming Language :: Python :: 2.6',
 		'Programming Language :: Python :: 2.7',
 		# 'Programming Language :: Python :: 3.0',
