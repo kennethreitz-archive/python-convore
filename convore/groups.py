@@ -73,18 +73,28 @@ class GroupsDiscoverExplore(object):
 
 class GroupDiscoverCategory(SyncedList):
 
-    __data_keys__ = ['slug',]
+    __data_keys__ = []
 
     def __init__(self):
         super(GroupDiscoverCategory, self).__init__()
 
     def get(self, key):
-        r = api.get('groups', 'discover', 'category', key)
-        print r.content
-        cat = models.Category()
-        cat.import_from_api(deserialize(r.content)['categories'])
-        return cat
 
+        r = api.get('groups', 'discover', 'category', key,
+                    error='Invalid group slug given.'
+                    )
+
+
+
+        groups = deserialize(r.content)['groups']
+
+        i = [c.slug for c in self.data].index(key)
+        self.data[i].groups = groups
+#
+        return self.data[i].__dict__
+
+
+        
     def sync(self):
         r = api.get('groups', 'discover', 'category')
         for _cat in deserialize(r.content)['categories']:
