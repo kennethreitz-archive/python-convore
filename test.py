@@ -2,29 +2,28 @@ from convore import Convore
 
 
 
-convore = Convore('requeststest', 'requeststest')
-print convore.account_verify()
 
-print convore.groups[81]
-print convore.groups[81]
-
-print '81' in convore.groups
-# print convore.groups[81]
-# print convore.groups[81]
-
-# print 81 in convore.groups
-
-# print convore.groups[81]
-# print convore.groups[81]
-
-# print convore.groups[81].__dict__
-
+# rint len(convore.groups)
+# # print convore.groups.joined()
+# # print len(convore.groups)
+# # # 
+# print convore.groups[81] 
+# print len(convore.groups)
+# # # print convore.groups
+# # 
 # print convore.groups.joined()
-
-# print groups
-
-
-# print len(groups)
 # 
-# for g in groups:
-#     print g
+# # print convore.groups
+# # print len(convore.groups)
+# # # print convore.groups.discover.explore
+# print convore.groups.discover.explore.popular()
+# print convore.groups.discover.explore.popular()
+# print len(convore.groups)
+# print convore.groups.discover.explore.popular()
+# print len(convore.groups)
+# print co';s;;ddlfkgjhz/xx.c,vmbmvcxzaFFqqqqewtyruyrtior5po92319198y477777777777777777777777777er   8hnvore.groups.discover.explore.recent()
+# print len(convore.groups)
+# print convore.groups.discover.explore.alphabetical()
+print convore.groups.discover.category
+# print len(convore.groups)
+#     
