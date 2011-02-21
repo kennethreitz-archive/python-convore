@@ -114,22 +114,3 @@ class Groups(SyncedList):
             group.import_from_api(_group)
             group.joined = True
             self.data.append(group)
-
-
-            
-
-        
-
-
-#^groups/discover/friend.json
-#^groups/discover/explore/(?P<angle>popular|recent|alphabetical).json
-#^groups/discover/category.json
-#^groups/discover/category/(?P<category>[\w-]+).json
-#^groups/discover/search.json
-#^groups/(?P<group_id>\d+)/join.json
-#^groups/(?P<group_id>\d+)/request.json
-
-
-
-
-
