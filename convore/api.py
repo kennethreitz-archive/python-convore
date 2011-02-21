@@ -48,7 +48,9 @@ def get(*path, **kwargs):
     """
     url =  '%s%s%s' % (API_URL, '/'.join(map(str, path)), '.json')
 
-    r = requests.get(url)
+    params = kwargs.get('params', None)
+
+    r = requests.get(url, params=params)
 
     error = kwargs.get('error', None)
     return _safe_response(r, error)
