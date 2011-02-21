@@ -88,14 +88,25 @@ class GroupDiscoverCategory(SyncedList):
 
         i = [c.slug for c in self.data].index(key)
         self.data[i].groups = groups
-#
-        return self.data[i].__dict__
+
+        return self.data[i]
 
 
-        
     def sync(self):
         r = api.get('groups', 'discover', 'category')
         for _cat in deserialize(r.content)['categories']:
             cat = models.Category()
             cat.import_from_api(_cat)
             self.data.append(cat)
+
+
+            
+class GroupDiscoverSearch(object):
+
+    def __repr__(self):
+        return '<groups/discover/search endpoint>'
+
+    def __getitem__(self, key):
+        return 'searched.'
+        
+        

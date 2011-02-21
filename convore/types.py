@@ -57,7 +57,6 @@ class SyncedList(object):
                 return _fetched
 
 
-            
     def __iter__(self):
         for d in self.data:
             yield d
