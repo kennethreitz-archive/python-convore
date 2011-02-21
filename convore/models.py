@@ -94,6 +94,7 @@ class Category(object):
         self.groups_count = None
         self.slug = None
         self.name = None
+        self.groups = None
 
     def __repr__(self):
         return '<category %s>' % (self.slug)
