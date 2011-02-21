@@ -46,13 +46,16 @@ class SyncedList(object):
             _fetched = self.get(key)
             if _fetched:
                 self.data.append(_fetched)
-                if hasattr(self, 'parent'):
-                    self.parent.data.append(_fetched)
-                    if hasattr(self.parent, 'parent'):
-                        self.parent.parent.data.append(_fetched)
-                        print 'woah'
+                try:
+                    if hasattr(self, 'parent'):
+                        self.parent.data.append(_fetched)
+                        if hasattr(self.parent, 'parent'):
+                            self.parent.parent.data.append(_fetched)
+                except AttributeError:
+                    pass
 
                 return _fetched
+
 
             
     def __iter__(self):
