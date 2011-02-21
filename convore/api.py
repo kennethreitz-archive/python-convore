@@ -26,7 +26,7 @@ API_URL = 'https://convore.com/api/'
 # Helpers
 # =======
 
-def _safe_response(r):
+def _safe_response(r, error=None):
     try:
         r.raise_for_status()
         return r
@@ -34,11 +34,14 @@ def _safe_response(r):
         if r.status_code == 401:
             raise LoginFailed
         else:
-            raise APIError
+            raise APIError(error) if error else APIError
 
 
-def get(*path):
+def get(*path, **kwargs):
     """
+    Accepts optional error parameter, which will be passed in the event of a
+    non-401 HTTP error.
+    
     api.get('groups')
     api.get('groups', 'id')
     api.get('accounts', 'verify')
@@ -46,8 +49,9 @@ def get(*path):
     url =  '%s%s%s' % (API_URL, '/'.join(map(str, path)), '.json')
 
     r = requests.get(url)
-   
-    return _safe_response(r)
+
+    error = kwargs.get('error', None)
+    return _safe_response(r, error)
 
 
 def post(params, *path):
