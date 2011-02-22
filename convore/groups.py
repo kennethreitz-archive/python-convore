@@ -24,8 +24,6 @@ class GroupsDiscover(object):
         self.category = GroupDiscoverCategory()
         self.category.parent = self
 
-        self.search = GroupDiscoverSearch()
-
     def _discover_group(self, *cats):
         _groups = []
         r = api.get('groups', 'discover', *cats)
@@ -42,6 +40,18 @@ class GroupsDiscover(object):
 
     def friend(self):
         return self._discover_group('friend')
+
+    @staticmethod
+    def search(key):
+        _groups = []
+
+        r = api.get('groups', 'discover', 'search', params={'q': key})
+        for group in deserialize(r.content)['groups']:
+            _group = models.Group()
+            _group.import_from_api(group)
+            _groups.append(_group)
+            
+        return _groups
 
 
 class GroupsDiscoverExplore(object):
@@ -101,26 +111,3 @@ class GroupDiscoverCategory(SyncedList):
             cat.import_from_api(_cat)
             self.data.append(cat)
 
-
-            
-class GroupDiscoverSearch(object):
-
-    def __repr__(self):
-        return '<groups/discover/search endpoint>'
-
-    def __getitem__(self, key):
-
-        _groups = []
-
-        r = api.get('groups', 'discover', 'search', params={'q': key})
-        for group in deserialize(r.content)['groups']:
-            _group = models.Group()
-            _group.import_from_api(group)
-            _groups.append(_group)
-
-        if len(_groups):
-            return _groups
-        else:
-            return None
-        
-        
