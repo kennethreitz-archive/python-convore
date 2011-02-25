@@ -10,5 +10,5 @@ CONVORE_PASS = os.environ.get('CONVORE_PASS', 'requeststest')
 
 convore = Convore(CONVORE_NAME, CONVORE_PASS)
 
-print convore.groups.discover.category
-
+#print convore.groups.discover.category
+convore.groups.discover.search('github')
