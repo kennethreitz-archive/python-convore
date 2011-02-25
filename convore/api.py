@@ -20,7 +20,7 @@ import groups
 
 
 API_URL = 'https://convore.com/api/'
-
+AUTH = None
 
 # =======
 # Helpers
@@ -50,7 +50,7 @@ def get(*path, **kwargs):
 
     params = kwargs.get('params', None)
 
-    r = requests.get(url, params=params)
+    r = requests.get(url, params=params, auth=auth)
 
     error = kwargs.get('error', None)
     return _safe_response(r, error)
@@ -59,7 +59,7 @@ def get(*path, **kwargs):
 def post(params, *path):
     
     url =  '%s%s%s' % (API_URL, '/'.join(map(str, path)), '.json')
-    r = requests.post(url, params=params)
+    r = requests.post(url, params=params, auth=auth)
     return _safe_response(r)
 
 
@@ -77,9 +77,10 @@ class APIError(RuntimeError):
 
 def login(username, password):
     """Configured API Credentials"""
-    auth = requests.AuthObject(username, password)
-    requests.add_autoauth(API_URL, auth)
-
+    global auth
+    
+    auth = (username, password)
+    # print requests.auth_manager.__dict__
 
 # ==========
 # End Points
@@ -120,3 +121,14 @@ class Groups(SyncedList):
             group.import_from_api(_group)
             group.joined = True
             self.data.append(group)
+
+
+class Topics(SyncedList):
+
+    __data_keys__ = []
+
+    def __init__(self):
+        pass
+
+    def import_from_api(self, d):
+        print d
