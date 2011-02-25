@@ -7,7 +7,7 @@
     Convore test suite.
 
     Looks for authentication in 'CONVORE_NAME' and
-    'CONVORE_PASS' environment variables.
+    'CONVORE_PASS' environment variables for configuration.
 
     :copyright: (c) 2011 by Kenneth Reitz.
     :license: ISC, see LICENSE for more details.
@@ -15,7 +15,8 @@
 
 
 import os
-import unittest
+
+import unittest2 as unittest
 
 import convore
 
