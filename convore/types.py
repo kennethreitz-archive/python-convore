@@ -3,7 +3,7 @@
     convore.types
     ~~~~~~~~~~~
 
-    This module contains the reusable helper objects 
+    This module contains the reusable helper objects
     used throughout the wrapper.
 
     :copyright: (c) 2011 by Kenneth Reitz.
@@ -24,14 +24,14 @@ class SyncedList(object):
 
     def __init__(self):
         self.data = []
-        if hasattr(self, 'sync'):
-            self.sync()
+        #if hasattr(self, 'sync'):
+        #    self.sync()
 
 
     def __repr__(self):
         return str(self.data)
 
-    
+
     def __getitem__(self, key):
 
         if isinstance(key, int):
