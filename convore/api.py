@@ -59,7 +59,7 @@ def get(*path, **kwargs):
 def post(params, *path):
 
     url =  '%s%s%s' % (API_URL, '/'.join(map(str, path)), '.json')
-    r = requests.post(url, params=params, auth=auth)
+    r = requests.post(url, data=params, auth=auth)
     return _safe_response(r)
 
 
@@ -174,7 +174,6 @@ class Messages(SyncedList):
         return topic
 
     def sync(self):
-
         self.data = []
 
         r = get('topics', self.topic.id, 'messages')
@@ -185,3 +184,10 @@ class Messages(SyncedList):
             message.topic = self.topic
             self.data.append(message)
 
+    def create(self, message):
+        params = {'topic_id': message.topic.id, 'message': message.message}
+        r = post(params ,'topics', message.topic.id, 'messages', 'create')
+        message = models.Message()
+        message.import_from_api(deserialize(r.content)['message'])
+        self.data.append(message)
+        return True
