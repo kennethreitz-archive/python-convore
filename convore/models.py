@@ -3,7 +3,7 @@
     convore.models
     ~~~~~~~~~~~~~~
 
-    This module implements the internal models for 
+    This module implements the internal models for
     Convore API object storage.
 
     :copyright: (c) 2011 by Kenneth Reitz.
@@ -54,7 +54,7 @@ class Group(object):
         self.id = None
         self.joined = False
 
-        
+
     def import_from_api(self, d):
         """Constructs Group from Deserialized API Response."""
 
@@ -87,6 +87,61 @@ class Group(object):
 
     def __repr__(self):
         return '<group %s>' % (self.slug)
+
+class Topic(object):
+    """Convore topic object"""
+
+    def __init__(self):
+        self.id = None
+        self.name = None
+        self.slug = None
+        self.url = None
+        self.message_count = None
+        self.unread = None
+        self.date_created = None
+        self.date_latest_message = None
+        self.creator = None
+
+
+    def import_from_api(self, data):
+        self.creator = User()
+
+        self.id = data.get('id', None)
+        self.name = data.get('name', None)
+        self.slug = data.get('slug', None)
+        self.url = data.get('url', None)
+        self.message_count = data.get('message_count', None)
+        self.unread = data.get('unread', None)
+        self.date_created = datetime.utcfromtimestamp(
+                data.get('date_created', None)
+        )
+        self.date_latest_message = datetime.utcfromtimestamp(
+                data.get('date_latest_message', None)
+        )
+        self.creator.import_from_api(data.get('creator', None))
+
+
+class Message(object):
+    """Convore message object"""
+
+    def __init__(self):
+        self.id = None
+        self.message = None
+        self.date_created = None
+        self.user = None
+
+
+    def import_from_api(self, data):
+        self.user = User()
+
+        self.id = data.get('id', None)
+        self.message = data.get('message', None)
+        self.date_created = datetime.utcfromtimestamp(
+                data.get('date_created', None)
+        )
+        self.user.import_from_api(data.get('user', None))
+
+
 
 
 class Category(object):

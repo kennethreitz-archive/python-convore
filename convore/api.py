@@ -41,7 +41,7 @@ def get(*path, **kwargs):
     """
     Accepts optional error parameter, which will be passed in the event of a
     non-401 HTTP error.
-    
+
     api.get('groups')
     api.get('groups', 'id')
     api.get('accounts', 'verify')
@@ -57,7 +57,7 @@ def get(*path, **kwargs):
 
 
 def post(params, *path):
-    
+
     url =  '%s%s%s' % (API_URL, '/'.join(map(str, path)), '.json')
     r = requests.post(url, params=params, auth=auth)
     return _safe_response(r)
@@ -78,7 +78,7 @@ class APIError(RuntimeError):
 def login(username, password):
     """Configured API Credentials"""
     global auth
-    
+
     auth = (username, password)
     # print requests.auth_manager.__dict__
 
@@ -120,15 +120,68 @@ class Groups(SyncedList):
             group = models.Group()
             group.import_from_api(_group)
             group.joined = True
+            group.topics = Topics(group)
             self.data.append(group)
 
 
 class Topics(SyncedList):
 
-    __data_keys__ = []
+    __data_keys__ = ['id', 'slug']
 
-    def __init__(self):
-        pass
+    def __init__(self, group):
+        super(Topics, self).__init__()
+        self.group = group
 
-    def import_from_api(self, d):
-        print d
+    def list(self):
+        return self.data
+
+    def get(self, key):
+        r = get('topics', key)
+
+        topic = models.Topic()
+        topic.import_from_api(deserialize(r.content)['topic'])
+        return topic
+
+    def sync(self):
+
+        self.data = []
+
+        r = get('groups', self.group.id, 'topics')
+        for _topic in deserialize(r.content)['topics']:
+
+            topic = models.Topic()
+            topic.import_from_api(_topic)
+            topic.messages = Messages(topic)
+            topic.group = self.group
+            self.data.append(topic)
+
+class Messages(SyncedList):
+
+    __data_keys__ = ['id', 'slug']
+
+    def __init__(self, topic):
+        super(Messages, self).__init__()
+        self.topic = topic
+
+    def list(self):
+        return self.data
+
+    def get(self, key):
+        r = get('topics', key)
+
+        topic = models.Topic()
+        topic.import_from_api(deserialize(r.content)['topic'])
+        return topic
+
+    def sync(self):
+
+        self.data = []
+
+        r = get('topics', self.topic.id, 'messages')
+        for _message in deserialize(r.content)['messages']:
+
+            message = models.Message()
+            message.import_from_api(_message)
+            message.topic = self.topic
+            self.data.append(message)
+
