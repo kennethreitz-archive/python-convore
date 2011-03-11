@@ -155,6 +155,15 @@ class Topics(SyncedList):
             topic.group = self.group
             self.data.append(topic)
 
+    def create(self, name):
+        params = {'topic_id': self.group.id, 'name': name}
+        r = post(params ,'groups', self.group.id, 'topics', 'create')
+        topic = models.Topic()
+        topic.import_from_api(deserialize(r.content)['topic'])
+        self.data.insert(0,topic)
+        return True
+
+
 class Messages(SyncedList):
 
     __data_keys__ = ['id', 'slug']
@@ -185,8 +194,8 @@ class Messages(SyncedList):
             self.data.append(message)
 
     def create(self, message):
-        params = {'topic_id': message.topic.id, 'message': message.message}
-        r = post(params ,'topics', message.topic.id, 'messages', 'create')
+        params = {'topic_id': self.topic.id, 'message': message}
+        r = post(params ,'topics', self.topic.id, 'messages', 'create')
         message = models.Message()
         message.import_from_api(deserialize(r.content)['message'])
         self.data.append(message)
