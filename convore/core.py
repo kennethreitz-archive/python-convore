@@ -12,6 +12,7 @@
 from convore.packages.anyjson import deserialize
 
 import api
+import models
 
 
 __title__ = 'convore'
@@ -25,6 +26,13 @@ __docformat__ = 'restructuredtext'
 __all__ = ('Convore',)
 
 
+LIVE_TYPES = {
+    'read': models.Read,
+    'message': models.Message,
+    'topic': models.Topic,
+    'login': models.Login,
+    'logout': models.Logout,
+}
 
 class Convore(object):
     """The main Convore interface object."""
@@ -44,8 +52,31 @@ class Convore(object):
 
     def live(self, cursor=None):
         params= {}
+        next_cursor = None
+
+        live_messages = list()
         if cursor <> None:
             params['cursor'] = cursor
 
         r = api.get('live', params=params)
-        return deserialize(r.content)
+
+        try:
+            for data in deserialize(r.content)['messages']:
+                class_ = LIVE_TYPES[data['kind']]
+                message = class_()
+                message.import_from_api(data)
+                if data['kind'] == 'read':
+                    group = self.groups.get(data['group_id'])
+                    message.topic = group.topics.get(data['topic_id'])
+                elif data['kind'] == 'topic':
+                    message.group = self.groups.get(data['group_id'])
+                elif data['kind'] == 'message':
+                    group = self.groups.get(data['group'])
+                    message.topic = group.topics.get(data['topic']['id'])
+
+                live_messages.append({'kind': data['kind'],
+                                      'message': message})
+                next_cursor = data['_id']
+        except KeyError:
+            pass
+        return (live_messages, next_cursor)

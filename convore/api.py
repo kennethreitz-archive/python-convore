@@ -102,26 +102,25 @@ class Groups(SyncedList):
 
         return [g for g in self.data if g.joined]
 
-
     def get(self, key):
         r = get('groups', key)
-
-        group = models.Group()
-        group.import_from_api(deserialize(r.content)['group'])
+        group = self._create_group_from_api(deserialize(r.content)['group'])
         return group
 
     def sync(self):
-
         self.data = []
 
         r = get('groups')
         for _group in deserialize(r.content)['groups']:
-
-            group = models.Group()
-            group.import_from_api(_group)
-            group.joined = True
-            group.topics = Topics(group)
+            group = self._create_group_from_api(_group)
             self.data.append(group)
+
+    def _create_group_from_api(self, _group):
+        group = models.Group()
+        group.import_from_api(_group)
+        group.joined = True
+        group.topics = Topics(group)
+        return group
 
 
 class Topics(SyncedList):
@@ -137,23 +136,23 @@ class Topics(SyncedList):
 
     def get(self, key):
         r = get('topics', key)
-
-        topic = models.Topic()
-        topic.import_from_api(deserialize(r.content)['topic'])
+        topic = self._create_topic_from_api(deserialize(r.content)['topic'])
         return topic
 
     def sync(self):
-
         self.data = []
 
         r = get('groups', self.group.id, 'topics')
         for _topic in deserialize(r.content)['topics']:
-
-            topic = models.Topic()
-            topic.import_from_api(_topic)
-            topic.messages = Messages(topic)
-            topic.group = self.group
+            topic = self._create_topic_from_api(_topic)
             self.data.append(topic)
+
+    def _create_topic_from_api(self, _topic):
+        topic = models.Topic()
+        topic.import_from_api(_topic)
+        topic.messages = Messages(topic)
+        topic.group = self.group
+        return topic
 
     def create(self, name):
         params = {'topic_id': self.group.id, 'name': name}
@@ -174,13 +173,6 @@ class Messages(SyncedList):
 
     def list(self):
         return self.data
-
-    def get(self, key):
-        r = get('topics', key)
-
-        topic = models.Topic()
-        topic.import_from_api(deserialize(r.content)['topic'])
-        return topic
 
     def sync(self):
         self.data = []

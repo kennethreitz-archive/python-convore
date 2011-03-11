@@ -84,9 +84,9 @@ class Group(object):
                 _user.import_from_api(friend)
                 self.friends.append(_user)
 
-
     def __repr__(self):
         return '<group %s>' % (self.slug)
+
 
 class Topic(object):
     """Convore topic object"""
@@ -142,8 +142,6 @@ class Message(object):
         self.user.import_from_api(data.get('user', None))
 
 
-
-
 class Category(object):
     def __init__(self):
         self.groups_count = None
@@ -159,3 +157,46 @@ class Category(object):
         self.groups_count = d.get('groups_count', None)
         self.slug = d.get('slug', None)
         self.name = d.get('name', None)
+
+
+class Read(object):
+    def __init__(self):
+        self.topic = None
+        self.when  = None
+        self.user  = None
+
+    def import_from_api(self, data):
+        """Constructs object from deserialized API Response."""
+        self.when  = datetime.utcfromtimestamp(
+                data.get('_ts', None)
+        )
+        self.user  = User()
+        self.user.import_from_api(data.get('user', None))
+
+
+class Login(object):
+    def __init__(self):
+        self.when  = None
+        self.user  = None
+
+    def import_from_api(self, data):
+        """Constructs object from deserialized API Response."""
+        self.when  = datetime.utcfromtimestamp(
+                data.get('_ts', None)
+        )
+        self.user  = User()
+        self.user.import_from_api(data.get('user', None))
+
+
+class Logout(object):
+    def __init__(self):
+        self.when  = None
+        self.user  = None
+
+    def import_from_api(self, data):
+        """Constructs object from deserialized API Response."""
+        self.when  = datetime.utcfromtimestamp(
+                data.get('_ts', None)
+        )
+        self.user  = User()
+        self.user.import_from_api(data.get('user', None))
