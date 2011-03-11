@@ -9,6 +9,7 @@
     :license: ISC, see LICENSE for more details.
 """
 
+from convore.packages.anyjson import deserialize
 
 import api
 
@@ -27,7 +28,7 @@ __all__ = ('Convore',)
 
 class Convore(object):
     """The main Convore interface object."""
-    
+
     def __init__(self, username, password):
         self.username = username
         api.login(username, password)
@@ -40,3 +41,11 @@ class Convore(object):
             return True
         else:
             return False
+
+    def live(self, cursor=None):
+        params= {}
+        if cursor <> None:
+            params['cursor'] = cursor
+
+        r = api.get('live', params=params)
+        return deserialize(r.content)
