@@ -33,7 +33,7 @@ setup(
     author='Kenneth Reitz',
     author_email='me@kennethreitz.com',
     url='https://github.com/kennethreitz/python-convore',
-    packages= ['convore'],
+    packages= ['convore', 'convore.packages', 'convore.packages.anyjson'],
     install_requires=required,
     license='ISC',
     classifiers=(
