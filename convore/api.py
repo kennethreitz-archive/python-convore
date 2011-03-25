@@ -92,10 +92,9 @@ class Groups(SyncedList):
     __data_keys__ = ['id', 'slug']
 
     def __init__(self):
-        super(Groups, self).__init__()
-
         self.discover = groups.GroupsDiscover()
         self.discover.parent = self
+        super(Groups, self).__init__()
 
     def joined(self):
         """Returns list of Joined groups."""
@@ -129,8 +128,8 @@ class Topics(SyncedList):
     __data_keys__ = ['id', 'slug']
 
     def __init__(self, group):
-        super(Topics, self).__init__()
         self.group = group
+        super(Topics, self).__init__()
 
     def list(self):
         return self.data
@@ -160,8 +159,8 @@ class Messages(SyncedList):
     __data_keys__ = ['id', 'slug']
 
     def __init__(self, topic):
-        super(Messages, self).__init__()
         self.topic = topic
+        super(Messages, self).__init__()
 
     def list(self):
         return self.data
