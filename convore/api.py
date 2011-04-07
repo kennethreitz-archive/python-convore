@@ -157,15 +157,14 @@ class Topics(SyncedList):
     def create(self, name):
         params = {'topic_id': self.group.id, 'name': name}
         r = post(params ,'groups', self.group.id, 'topics', 'create')
-        topic = models.Topic()
-        topic.import_from_api(deserialize(r.content)['topic'])
+        topic = self._create_topic_from_api(deserialize(r.content)['topic'])
         self.data.insert(0,topic)
         return True
 
 
 class Messages(SyncedList):
 
-    __data_keys__ = ['id', 'slug']
+    __data_keys__ = ['id']
 
     def __init__(self, topic):
         super(Messages, self).__init__()
