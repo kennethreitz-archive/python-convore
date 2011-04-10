@@ -27,7 +27,7 @@ CONVORE_PASS = os.environ.get('CONVORE_PASS', 'requeststest')
 
 class ConvoreAPI(unittest.TestCase):
     """Requests test cases."""
-    
+
     def setUp(self):
         self.convore = convore.Convore(CONVORE_NAME, CONVORE_PASS)
 
@@ -44,7 +44,7 @@ class ConvoreAPI(unittest.TestCase):
 class ConvoreGroups(unittest.TestCase):
     def setUp(self):
         self.convore = convore.Convore(CONVORE_NAME, CONVORE_PASS)
-        
+
     def test_works(self):
         self.convore.groups
 

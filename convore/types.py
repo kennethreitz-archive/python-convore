@@ -24,15 +24,22 @@ class SyncedList(object):
 
     def __init__(self):
         self.data = []
-        #if hasattr(self, 'sync'):
-        #    self.sync()
-
+        self._synced = False
 
     def __repr__(self):
         return str(self.data)
 
+    def _sync(self):
+        """private method that makes sure the list is synced
+        when first acessed."""
+        #we sync on first access.
+        if self._synced == False and hasattr(self, 'sync') == True:
+            self.sync()
+            self._synced = True
 
     def __getitem__(self, key):
+        #make sure we have been synced
+        self._sync()
 
         if isinstance(key, int):
             key = unicode(key)
@@ -67,6 +74,8 @@ class SyncedList(object):
 
 
     def __contains__(self, key):
+        #make sure we have been synced
+        self._sync()
 
         if isinstance(key, int):
             key = unicode(key)
