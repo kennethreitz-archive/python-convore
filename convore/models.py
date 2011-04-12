@@ -50,7 +50,7 @@ class Group(object):
         self.date_created = None
         self.topics_count = None
         self.friends = None
-        self.unread = None
+        self.unread = 0
         self.id = None
         self.joined = False
 
@@ -87,6 +87,28 @@ class Group(object):
     def __repr__(self):
         return '<group %s>' % (self.slug)
 
+    def mark_topic_read(self, read):
+        if read.topic.id not in self.topics:
+            return
+
+        self.unread = self.unread - read.unread_count
+        self.topics[read.topic.id].mark_read()
+
+    def add_message(self, message):
+        self.unread = self.unread + 1
+
+        if not self.topics:
+            return
+
+        if message.topic.id not in self.topics:
+            self.topics.insert(0, message.topic)
+
+        topic = self.topics[message.topic.id]
+
+        if topic.messages:
+            if message.id not in topic.messages:
+                topic.add_message(message)
+
 
 class Topic(object):
     """Convore topic object"""
@@ -97,10 +119,11 @@ class Topic(object):
         self.slug = None
         self.url = None
         self.message_count = None
-        self.unread = None
+        self.unread = 0
         self.date_created = None
         self.date_latest_message = None
         self.creator = None
+        self.messages = []
 
 
     def import_from_api(self, data):
@@ -120,6 +143,17 @@ class Topic(object):
         )
         self.creator.import_from_api(data.get('creator', None))
 
+    def mark_read(self):
+        for m in self.messages:
+            m.unread = False
+
+        self.unread = 0
+
+    def add_message(self, message):
+        message.unread = True
+        self.messages.append(message)
+        self.unread = self.unread + 1
+        self.group.unread = self.group.unread + 1
 
 class Message(object):
     """Convore message object"""
@@ -165,6 +199,7 @@ class Read(object):
         self.topic = None
         self.when  = None
         self.user  = None
+        self.unread_count = 0
 
     def import_from_api(self, data):
         """Constructs object from deserialized API Response."""
@@ -173,7 +208,7 @@ class Read(object):
         )
         self.user  = User()
         self.user.import_from_api(data.get('user', None))
-
+        self.unread_count = data.get('unread_count')
 
 class Login(object):
     def __init__(self):
