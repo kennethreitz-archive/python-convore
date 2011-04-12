@@ -129,6 +129,7 @@ class Message(object):
         self.message = None
         self.date_created = None
         self.user = None
+        self.unread = False
 
 
     def import_from_api(self, data):

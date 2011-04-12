@@ -134,6 +134,12 @@ class Topics(SyncedList):
     def list(self):
         return self.data
 
+    def insert(self, index, object):
+        return self.data.insert(index, object)
+
+    def append(self, object):
+        return self.data.append(object)
+
     def get(self, key):
         r = get('topics', key)
         topic = self._create_topic_from_api(deserialize(r.content)['topic'])
@@ -177,12 +183,18 @@ class Messages(SyncedList):
         self.data = []
 
         r = get('topics', self.topic.id, 'messages')
-        for _message in deserialize(r.content)['messages']:
-
+        messages = deserialize(r.content)['messages']
+        idx = 0
+        msg_count = len(messages)
+        unread_count = self.topic.unread
+        for message_data in messages:
+            idx = idx + 1
             message = models.Message()
-            message.import_from_api(_message)
+            message.import_from_api(message_data)
             message.topic = self.topic
+            message.unread = idx > msg_count - unread_count
             self.data.append(message)
+
 
     def create(self, message):
         params = {'topic_id': self.topic.id, 'message': message}

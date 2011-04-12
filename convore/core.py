@@ -62,14 +62,18 @@ class Convore(object):
 
         try:
             for data in deserialize(r.content)['messages']:
-                class_ = LIVE_TYPES[data['kind']]
+                try:
+                    class_ = LIVE_TYPES[data['kind']]
+                except KeyError:
+                    continue
+
                 message = class_()
                 message.import_from_api(data)
                 if data['kind'] == 'read':
                     group = self.groups.get(data['group_id'])
                     message.topic = group.topics.get(data['topic_id'])
                 elif data['kind'] == 'topic':
-                    message.group = self.groups.get(data['group_id'])
+                    message.group = self.groups.get(data['group'])
                 elif data['kind'] == 'message':
                     group = self.groups.get(data['group'])
                     message.topic = group.topics.get(data['topic']['id'])
