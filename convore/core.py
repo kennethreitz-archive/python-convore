@@ -50,18 +50,23 @@ class Convore(object):
         else:
             return False
 
-    def live(self, cursor=None):
+
+    def fetch_live_data(self, cursor=None):
         params= {}
         next_cursor = None
 
-        live_messages = list()
         if cursor <> None:
             params['cursor'] = cursor
 
         r = api.get('live', params=params)
+        return deserialize(r.content)['messages']
+
+    def live(self, cursor=None):
 
         try:
-            for data in deserialize(r.content)['messages']:
+            live_messages = list()
+            messages = self.fetch_live_data(cursor)
+            for data in messages:
                 try:
                     class_ = LIVE_TYPES[data['kind']]
                 except KeyError:
@@ -69,6 +74,7 @@ class Convore(object):
 
                 message = class_()
                 message.import_from_api(data)
+
                 if data['kind'] == 'read':
                     group = self.groups.get(data['group_id'])
                     message.topic = group.topics.get(data['topic_id'])
