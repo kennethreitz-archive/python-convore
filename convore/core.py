@@ -53,7 +53,6 @@ class Convore(object):
 
     def fetch_live_data(self, cursor=None):
         params= {}
-        next_cursor = None
 
         if cursor <> None:
             params['cursor'] = cursor
@@ -64,6 +63,7 @@ class Convore(object):
     def live(self, cursor=None):
 
         try:
+            next_cursor = None
             live_messages = list()
             messages = self.fetch_live_data(cursor)
             for data in messages:
