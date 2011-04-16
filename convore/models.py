@@ -73,7 +73,7 @@ class Group(object):
                 d.get('date_created', None)
         )
         self.topics_count = d.get('topics_count', None)
-        self.unread = d.get('unread', None)
+        self.unread = d.get('unread', 0)
         self.id = d.get('id', None)
 
         self.friends = []
@@ -141,7 +141,7 @@ class Topic(object):
         self.slug = data.get('slug', None)
         self.url = data.get('url', None)
         self.message_count = data.get('message_count', None)
-        self.unread = data.get('unread', None)
+        self.unread = data.get('unread', 0)
         self.date_created = datetime.utcfromtimestamp(
                 data.get('date_created', None)
         )
