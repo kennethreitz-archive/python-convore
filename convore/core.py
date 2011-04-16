@@ -61,32 +61,32 @@ class Convore(object):
         return deserialize(r.content)['messages']
 
     def live(self, cursor=None):
+        messages = self.fetch_live_data(cursor)
+        (live_messages, next_cursor) = self.import_live_from_api(messages)
 
-        try:
-            next_cursor = None
-            live_messages = list()
-            messages = self.fetch_live_data(cursor)
-            for data in messages:
-                try:
-                    class_ = LIVE_TYPES[data['kind']]
-                except KeyError:
-                    continue
+        return (live_messages, next_cursor)
 
-                message = class_()
-                message.import_from_api(data)
+    def import_live_from_api(self, messages):
+        live_messages = list()
+        next_cursor = None
+        for data in messages:
+            try:
+                class_ = LIVE_TYPES[data['kind']]
+            except KeyError:
+                continue
 
-                if data['kind'] == 'read':
-                    group = self.groups.get(data['group_id'])
-                    message.topic = group.topics.get(data['topic_id'])
-                elif data['kind'] == 'topic':
-                    message.group = self.groups.get(data['group'])
-                elif data['kind'] == 'message':
-                    group = self.groups.get(data['group'])
-                    message.topic = group.topics.get(data['topic']['id'])
+            message = class_()
+            message.import_from_api(data)
 
-                live_messages.append({'kind': data['kind'],
-                                      'message': message})
-                next_cursor = data['_id']
-        except KeyError:
-            pass
+            if data['kind'] == 'topic':
+                message.group_id = data['group']
+            elif data['kind'] == 'message':
+                message.group_id = data['group']
+                message.topic = models.LiveTopic()
+                message.topic.import_from_api(data['topic'])
+
+            live_messages.append({'kind': data['kind'],
+                                  'message': message})
+            next_cursor = data['_id']
+
         return (live_messages, next_cursor)

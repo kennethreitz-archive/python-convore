@@ -114,6 +114,7 @@ class Groups(SyncedList):
         for _group in deserialize(r.content)['groups']:
             group = self._create_group_from_api(_group)
             self.data.append(group)
+        self._synced = True
 
     def _create_group_from_api(self, _group):
         group = models.Group()
@@ -152,6 +153,7 @@ class Topics(SyncedList):
         for _topic in deserialize(r.content)['topics']:
             topic = self._create_topic_from_api(_topic)
             self.data.append(topic)
+        self._synced = True
 
     def _create_topic_from_api(self, _topic):
         topic = models.Topic()
@@ -194,7 +196,7 @@ class Messages(SyncedList):
             message.topic = self.topic
             message.unread = idx > msg_count - unread_count
             self.data.append(message)
-
+        self._synced = True
 
     def create(self, message):
         params = {'topic_id': self.topic.id, 'message': message}

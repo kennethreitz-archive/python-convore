@@ -88,21 +88,28 @@ class Group(object):
         return '<group %s>' % (self.slug)
 
     def mark_topic_read(self, read):
-        if read.topic.id not in self.topics:
+        if not self.topics:
+            return
+        if read.topic_id not in self.topics:
             return
 
         self.unread = self.unread - read.unread_count
-        self.topics[read.topic.id].mark_read()
+        self.topics[read.topic_id].mark_read()
 
     def add_message(self, message):
         self.unread = self.unread + 1
 
+        #If there are no topics we haven't synced this group yet.
+        #So there is nothing else todo.
         if not self.topics:
             return
 
+        #If the topic of the messages isn't in our topics
+        #resync the group topics.
         if message.topic.id not in self.topics:
-            self.topics.insert(0, message.topic)
+            self.topics.sync()
 
+        #we now assume the topic is there.
         topic = self.topics[message.topic.id]
 
         if topic.messages:
@@ -153,7 +160,17 @@ class Topic(object):
         message.unread = True
         self.messages.append(message)
         self.unread = self.unread + 1
-        self.group.unread = self.group.unread + 1
+
+class LiveTopic(object):
+    def __init__(self):
+        self.id = None
+        self.name = None
+        self.url = None
+
+    def import_from_api(self, data):
+        self.id = data.get('id', None)
+        self.name = data.get('name', None)
+        self.url = data.get('url', None)
 
 class Message(object):
     """Convore message object"""
@@ -172,8 +189,7 @@ class Message(object):
         self.id = data.get('id', None)
         self.message = data.get('message', None)
         self.date_created = datetime.utcfromtimestamp(
-                data.get('date_created', None)
-        )
+                data.get('date_created', None))
         self.user.import_from_api(data.get('user', None))
 
 
@@ -196,7 +212,8 @@ class Category(object):
 
 class Read(object):
     def __init__(self):
-        self.topic = None
+        self.group_id = None
+        self.topic_id = None
         self.when  = None
         self.user  = None
         self.unread_count = 0
@@ -208,7 +225,9 @@ class Read(object):
         )
         self.user  = User()
         self.user.import_from_api(data.get('user', None))
-        self.unread_count = data.get('unread_count')
+        self.unread_count = data.get('unread_count', 0)
+        self.group_id = data.get('group_id', None)
+        self.topic_id = data.get('topic_id', None)
 
 class Login(object):
     def __init__(self):
