@@ -158,7 +158,7 @@ class Topic(object):
 
     def add_message(self, message):
         message.unread = True
-        self.messages.append(message)
+        self.messages.list().append(message)
         self.unread = self.unread + 1
 
 class LiveTopic(object):
