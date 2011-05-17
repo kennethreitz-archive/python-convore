@@ -85,3 +85,8 @@ class SyncedList(object):
                return True
 
         return False
+
+class ConvoreSyncedList(SyncedList):
+    def __init__(self, endpoints):
+        super(ConvoreSyncedList, self).__init__()
+        self.endpoints = endpoints

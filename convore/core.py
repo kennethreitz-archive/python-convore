@@ -10,9 +10,8 @@
 """
 
 from convore.packages.anyjson import deserialize
-
-from types import SyncedList
-import api
+from types import SyncedList, ConvoreSyncedList
+from api import Endpoints
 import models
 import groups
 
@@ -41,36 +40,28 @@ class Convore(object):
 
     def __init__(self, username, password):
         self.username = username
-        api.login(username, password)
+        self.endpoints = Endpoints((username, password))
 
-        self.groups = Groups()
+        self.groups = Groups(self.endpoints)
 
     def account_verify(self):
-        r = api.get('account', 'verify')
-        if r.status_code == 200:
-            return True
-        else:
+        r = self.endpoints.call(self.endpoints.account_verify)
+        if r.has_key('error'):
             return False
+        else:
+            return True
 
 
-    def fetch_live_data(self, cursor=None):
-        params= {}
+    def fetch_live_data(self, cursor=''):
+        return self.endpoints.call(self.endpoints.live, cursor=cursor)
 
-        if cursor <> None:
-            params['cursor'] = cursor
-
-        r = api.get('live', params=params)
-        return deserialize(r.content)['messages']
-
-    def live(self, cursor=None):
+    def live(self, cursor=''):
         messages = self.fetch_live_data(cursor)
-        (live_messages, next_cursor) = self.import_live_from_api(messages)
-
-        return (live_messages, next_cursor)
+        return self.import_live_from_api(messages)
 
     def import_live_from_api(self, messages):
         live_messages = list()
-        next_cursor = None
+        next_cursor = ''
         for data in messages:
             try:
                 class_ = LIVE_TYPES[data['kind']]
@@ -94,15 +85,14 @@ class Convore(object):
         return (live_messages, next_cursor)
 
 
-
-class Groups(SyncedList):
+class Groups(ConvoreSyncedList):
 
     __data_keys__ = ['id', 'slug']
 
-    def __init__(self):
-        super(Groups, self).__init__()
+    def __init__(self, endpoints):
+        super(Groups, self).__init__(endpoints)
 
-        self.discover = groups.GroupsDiscover()
+        self.discover = groups.GroupsDiscover(endpoints)
         self.discover.parent = self
 
     def joined(self):
@@ -111,15 +101,15 @@ class Groups(SyncedList):
         return [g for g in self.data if g.joined]
 
     def get(self, key):
-        r = api.get('groups', key)
-        group = self._create_group_from_api(deserialize(r.content)['group'])
+        data = self.endpoints.call(self.endpoints.group_detail, group_id=key)
+        group = self._create_group_from_api(data)
         return group
 
     def sync(self):
         self.data = []
 
-        r = api.get('groups')
-        for _group in deserialize(r.content)['groups']:
+        data = self.endpoints.call(self.endpoints.groups)
+        for _group in data['groups']:
             group = self._create_group_from_api(_group)
             self.data.append(group)
         self._synced = True
@@ -128,16 +118,16 @@ class Groups(SyncedList):
         group = models.Group()
         group.import_from_api(_group)
         group.joined = True
-        group.topics = Topics(group)
+        group.topics = Topics(group, self.endpoints)
         return group
 
 
-class Topics(SyncedList):
+class Topics(ConvoreSyncedList):
 
     __data_keys__ = ['id', 'slug']
 
-    def __init__(self, group):
-        super(Topics, self).__init__()
+    def __init__(self, group, endpoints):
+        super(Topics, self).__init__(endpoints)
         self.group = group
 
     def list(self):
@@ -150,15 +140,15 @@ class Topics(SyncedList):
         return self.data.append(object)
 
     def get(self, key):
-        r = api.get('topics', key)
-        topic = self._create_topic_from_api(deserialize(r.content)['topic'])
+        data = self.endpoints.call(self.endpoints.topic_detail, topic_id=key)
+        topic = self._create_topic_from_api(data['topic'])
         return topic
 
     def sync(self):
         self.data = []
 
-        r = api.get('groups', self.group.id, 'topics')
-        for _topic in deserialize(r.content)['topics']:
+        data = self.endpoints.call(self.endpoints.group_topics, group_id=self.group.id)
+        for _topic in data['topics']:
             topic = self._create_topic_from_api(_topic)
             self.data.append(topic)
         self._synced = True
@@ -166,24 +156,27 @@ class Topics(SyncedList):
     def _create_topic_from_api(self, _topic):
         topic = models.Topic()
         topic.import_from_api(_topic)
-        topic.messages = Messages(topic)
+        topic.messages = Messages(topic, self.endpoints)
         topic.group = self.group
         return topic
 
     def create(self, name):
         params = {'topic_id': self.group.id, 'name': name}
-        r = post(params ,'groups', self.group.id, 'topics', 'create')
-        topic = self._create_topic_from_api(deserialize(r.content)['topic'])
+        data = self.endpoints.call(self.endpoints.group_topic_create,
+                           group_id=self.group.id,
+                           name=name
+                           )
+        topic = self._create_topic_from_api(data['topic'])
         self.data.insert(0,topic)
         return True
 
 
-class Messages(SyncedList):
+class Messages(ConvoreSyncedList):
 
     __data_keys__ = ['id']
 
-    def __init__(self, topic):
-        super(Messages, self).__init__()
+    def __init__(self, topic, auth):
+        super(Messages, self).__init__(auth)
         self.topic = topic
 
     def list(self):
@@ -192,8 +185,10 @@ class Messages(SyncedList):
     def sync(self):
         self.data = []
 
-        r = api.get('topics', self.topic.id, 'messages')
-        messages = deserialize(r.content)['messages']
+        data = self.endpoints.call(self.endpoints.topic_messages,
+                                   topic_id=self.topic.id
+                                   )
+        messages = data['messages']
         idx = 0
         msg_count = len(messages)
         unread_count = self.topic.unread
@@ -208,9 +203,12 @@ class Messages(SyncedList):
 
     def create(self, message):
         params = {'topic_id': self.topic.id, 'message': message}
-        r = post(params ,'topics', self.topic.id, 'messages', 'create')
+        data = self.endpoints.call(self.endpoints.topic_message_create,
+                           topic_id=self.topic.id,
+                           message=message
+                           )
+
         message = models.Message()
-        message.import_from_api(deserialize(r.content)['message'])
+        message.import_from_api(data['message'])
         self.data.append(message)
         return True
-
