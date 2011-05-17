@@ -61,7 +61,7 @@ Hmm.. ::
 Installation
 ------------
 
-To install tablib, simply: ::
+To install convore, simply: ::
 
     $ pip install convore
 

@@ -479,3 +479,4 @@ class Endpoints(object):
 
     def call(self, endpoint, **params):
         return endpoint.call(auth=self.auth, **params)
+
