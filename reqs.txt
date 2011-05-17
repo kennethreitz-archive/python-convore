@@ -1,2 +1,2 @@
-requests=0.3.0
+requests=0.3.4
 unittest2
