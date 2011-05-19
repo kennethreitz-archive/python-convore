@@ -102,7 +102,7 @@ class Groups(ConvoreSyncedList):
 
     def get(self, key):
         data = self.endpoints.call(self.endpoints.group_detail, group_id=key)
-        group = self._create_group_from_api(data)
+        group = self._create_group_from_api(data["group"])
         return group
 
     def sync(self):

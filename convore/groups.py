@@ -92,7 +92,7 @@ class GroupDiscoverCategory(SyncedList):
 
         error = 'Invalid group slug given.'
 
-        r = self.endpoints.call(api.Endpoints.discover_groups_by_category, category_slug=key)
+        r = api.Endpoints.discover_groups_by_category.call(category_slug=key)
 
         groups = r['groups']
 
@@ -103,11 +103,8 @@ class GroupDiscoverCategory(SyncedList):
 
 
     def sync(self):
-        r = self.endpoints.call(api.Endpoints.discover_categories)
-        r = api.get('groups', 'discover', 'category')
-        for _cat in deserialize(r.content)['categories']:
+        r = api.Endpoints.discover_categories.call()
+        for _cat in r['categories']:
             cat = models.Category()
             cat.import_from_api(_cat)
             self.data.append(cat)
-
-
